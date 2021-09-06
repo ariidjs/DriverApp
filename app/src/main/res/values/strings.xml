@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">DriverApp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="welcome">Welcome!</string>
+    <string name="email">Email</string>
+    <string name="lupa_password">Lupa Password?</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="belum_mempunyai_akun">Belum mempunyai akun?</string>
+    <string name="daftar_sini">Daftar sini</string>
+    <string name="phone_desc">Silahkan masukkan No HP anda\n Anda akan menerima SMS yang berisi kode verifikasi</string>
+    <string name="no_hp_desc">Masukkan No Hp</string>
+    <string name="verifikasi">Verifikasi</string>
+    <string name="otp_desc">Silahkan masukkan kode yang sudah terkirim ke nomor %1$s</string>
+    <string name="timer">00:59</string>
+    <string name="kode_tidak_ada">Tidak menerima kode?</string>
+    <string name="kirim_ulang">Kirim ulang</string>
+    <string name="nama">Nama</string>
+    <string name="input_error">Tidak boleh kosong!</string>
+    <string name="ganti_no_hp">Ganti No HP</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="history">History</string>
+    <string name="logout">Logout</string>
+
+    <string name="permission_rationale">Permission is needed for core functionality</string>
+    <string name="permission_denied_explanation">Permission was denied, but is needed for core functionality.</string>
+    <string name="settings">Settings</string>
+    <string name="no_location_detected">No location detected. Make sure location is enabled on the device.</string>
+    <string name="location_setting_unknown">Location settings are inadequate, and cannot be fixed here. Fix in Settings.</string>
+    <string name="setting">Setting</string>
+    <string name="go_offline">Go Offline</string>
+    <string name="go_online">Go Online</string>
+    <string name="online_status">Anda Online</string>
+    <string name="offline_status">Anda Offline</string>
+</resources>

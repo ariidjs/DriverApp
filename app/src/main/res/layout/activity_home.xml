@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/app_bar"
+        layout="@layout/app_bar_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <me.ibrahimsn.lib.SmoothBottomBar
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_gravity="bottom"
+        android:layout_margin="16dp"
+        app:backgroundColor="@color/orange2"
+        app:iconSize="24dp"
+        app:iconTint="@color/black"
+        app:iconTintActive="@color/black"
+        app:indicatorColor="@color/white"
+        app:indicatorRadius="10dp"
+        app:itemPadding="10dp"
+        app:menu="@menu/menu_home"
+        app:cornerRadius="16dp"
+        app:sideMargins="10dp"
+        app:textColor="@color/black"
+        app:textSize="14sp" />
+
+</FrameLayout>
