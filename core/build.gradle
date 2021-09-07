@@ -3,6 +3,10 @@ plugins {
     id 'kotlin-android'
 }
 apply from: '../shared_dependencies.gradle'
+
+dependencies {
+    implementation 'androidx.exifinterface:exifinterface:1.2.0'
+}
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"

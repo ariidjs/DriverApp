@@ -23,4 +23,9 @@
     <style name="Theme.DriverApp.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.DriverApp.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <declare-styleable name="ViewFinderBackground">
+        <attr name="backgroundColor" format="color" />
+    </declare-styleable>
+
 </resources>

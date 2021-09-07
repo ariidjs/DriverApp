@@ -2,14 +2,30 @@ package app.proyekakhir.core.util
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.graphics.Rect
+import android.net.Uri
+import android.util.Log
+import android.util.Size
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.view.animation.Transformation
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.CheckResult
 import androidx.fragment.app.Fragment
+import com.google.android.material.snackbar.Snackbar
 import com.shashank.sony.fancytoastlib.FancyToast
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.OutputStream
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.roundToInt
+
 
 fun View.show() {
     this.visibility = View.VISIBLE
@@ -17,6 +33,75 @@ fun View.show() {
 
 fun View.hide() {
     this.visibility = View.GONE
+}
+
+fun Fragment.showPermissionSnackBar(
+    snackStrId: Int,
+    actionStrId: Int = 0,
+    listener: View.OnClickListener? = null
+) {
+    val snackBar = Snackbar.make(
+        requireView().findViewById(android.R.id.content),
+        getString(snackStrId),
+        Snackbar.LENGTH_INDEFINITE
+    )
+    if (actionStrId != 0 && listener != null) {
+        snackBar.setAction(getString(actionStrId), listener)
+    }
+    snackBar.show()
+}
+
+fun Fragment.tempFileImage(
+    context: Context,
+    bitmap: Bitmap,
+    name: String
+): String? {
+    val outputDir = context.cacheDir
+    val imageFile = File(outputDir, "$name.png")
+    val os: OutputStream
+    try {
+        os = FileOutputStream(imageFile)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
+        os.flush()
+        os.close()
+    } catch (e: Exception) {
+        Log.e(context.javaClass.simpleName, "Error writing file", e)
+    }
+    return imageFile.absolutePath
+}
+
+fun decodeUriToBitmap(mContext: Context, sendUri: Uri): Bitmap {
+    var getBitmap: Bitmap? = null
+    try {
+        try {
+            val imageStream = mContext.contentResolver.openInputStream(sendUri)
+            getBitmap = BitmapFactory.decodeStream(imageStream)
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        }
+    } catch (e: java.lang.Exception) {
+        e.printStackTrace()
+    }
+    return getBitmap!!
+}
+
+fun tempFileImage(
+    context: Context,
+    bitmap: Bitmap,
+    name: String
+): String? {
+    val outputDir = context.cacheDir
+    val imageFile = File(outputDir, "$name.png")
+    val os: OutputStream
+    try {
+        os = FileOutputStream(imageFile)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
+        os.flush()
+        os.close()
+    } catch (e: Exception) {
+        Log.e(context.javaClass.simpleName, "Error writing file", e)
+    }
+    return imageFile.absolutePath
 }
 
 fun Fragment.showToast(message: String, type: Int) {

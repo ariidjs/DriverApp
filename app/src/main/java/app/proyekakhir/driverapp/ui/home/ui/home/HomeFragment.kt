@@ -32,9 +32,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
-import com.google.android.gms.tasks.OnTokenCanceledListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.*
 import com.shashank.sony.fancytoastlib.FancyToast
@@ -69,7 +67,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        Log.i("TAG", "onAttach: ")
         initFirebase()
     }
 
@@ -121,8 +118,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-
-        Log.i("TAG", "onCreateView: ")
         collapseToolbar(binding)
         mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment?.getMapAsync(this)
@@ -133,7 +128,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         with(binding) {
-//            homeViewModel.initLocationListener(activity?.applicationContext!!)
             btnDropdown.setOnClickListener {
                 if (isExpanded) collapseToolbar(this) else expandToolbar(
                     this
