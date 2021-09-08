@@ -62,5 +62,9 @@
         android:id="@+id/regionCameraFragment"
         android:name="app.proyekakhir.driverapp.ui.camera.RegionCameraFragment"
         android:label="fragment_region_camera"
-        tools:layout="@layout/fragment_region_camera" />
+        tools:layout="@layout/fragment_region_camera" >
+        <action
+            android:id="@+id/action_regionCameraFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+    </fragment>
 </navigation>

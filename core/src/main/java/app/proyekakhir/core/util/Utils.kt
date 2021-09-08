@@ -4,17 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Matrix
-import android.graphics.Rect
 import android.net.Uri
 import android.util.Log
-import android.util.Size
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.Transformation
 import android.view.inputmethod.InputMethodManager
-import androidx.annotation.CheckResult
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import com.shashank.sony.fancytoastlib.FancyToast
@@ -22,9 +18,6 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.OutputStream
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
 
 
 fun View.show() {
@@ -52,20 +45,19 @@ fun Fragment.showPermissionSnackBar(
 }
 
 fun Fragment.tempFileImage(
-    context: Context,
     bitmap: Bitmap,
     name: String
 ): String? {
-    val outputDir = context.cacheDir
+    val outputDir = context?.cacheDir
     val imageFile = File(outputDir, "$name.png")
     val os: OutputStream
     try {
         os = FileOutputStream(imageFile)
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os)
         os.flush()
         os.close()
     } catch (e: Exception) {
-        Log.e(context.javaClass.simpleName, "Error writing file", e)
+        Log.e(this.javaClass.simpleName, "Error writing file", e)
     }
     return imageFile.absolutePath
 }

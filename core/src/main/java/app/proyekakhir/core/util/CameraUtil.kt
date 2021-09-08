@@ -1,8 +1,10 @@
 package app.proyekakhir.core.util
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.graphics.Rect
+import android.media.Image
 import android.util.Size
 import androidx.annotation.CheckResult
 import androidx.camera.core.AspectRatio
@@ -61,6 +63,14 @@ fun rotateBitmap(src: String, bitmap: Bitmap): Bitmap {
         e.printStackTrace()
     }
     return bitmap
+}
+
+fun Image.toBitmap(): Bitmap {
+    val buffer = planes[0].buffer
+    buffer.rewind()
+    val bytes = ByteArray(buffer.capacity())
+    buffer.get(bytes)
+    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
 }
 
 /**
