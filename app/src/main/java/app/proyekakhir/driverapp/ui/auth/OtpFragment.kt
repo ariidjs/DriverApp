@@ -1,43 +1,74 @@
 package app.proyekakhir.driverapp.ui.auth
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.transition.TransitionInflater
+import app.proyekakhir.core.data.Resource
+import app.proyekakhir.core.data.source.local.LocalProperties
+import app.proyekakhir.core.domain.model.auth.LoginData
+import app.proyekakhir.core.util.*
+import app.proyekakhir.core.util.Constants.KEY_API_TOKEN
+import app.proyekakhir.core.util.Constants.KEY_FCM_TOKEN
+import app.proyekakhir.core.util.Constants.KEY_ID_DRIVER
 import app.proyekakhir.core.util.Constants.TIMER_VALUE
-import app.proyekakhir.core.util.Constants.TYPE_REGISTER
-import app.proyekakhir.core.util.hide
-import app.proyekakhir.core.util.show
-import app.proyekakhir.core.util.showSoftKeyboard
-import app.proyekakhir.core.util.showToast
 import app.proyekakhir.driverapp.R
 import app.proyekakhir.driverapp.databinding.FragmentOtpBinding
+import app.proyekakhir.driverapp.ui.home.HomeActivity
+import app.proyekakhir.driverapp.util.handleAuth
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
+import com.google.firebase.messaging.FirebaseMessaging
 import com.shashank.sony.fancytoastlib.FancyToast
+import dagger.hilt.android.AndroidEntryPoint
+import id.ionbit.ionalert.IonAlert
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
+
+@AndroidEntryPoint
 class OtpFragment : Fragment() {
     private var _binding: FragmentOtpBinding? = null
+    private lateinit var loadingDialog: IonAlert
     private val binding get() = _binding!!
     private var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks? = null
     private var resendToken: PhoneAuthProvider.ForceResendingToken? = null
     private val firebaseAuth: FirebaseAuth by inject()
+    @Inject
+    lateinit var localProperties: LocalProperties
     private var timer: CountDownTimer? = null
     private var verificationId: String? = null
+    private val authViewModel: AuthViewModel by viewModel()
+    private var phoneNumber: String = ""
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val inflater = TransitionInflater.from(requireContext())
+        exitTransition = inflater.inflateTransition(R.transition.slide_right)
+        enterTransition = inflater.inflateTransition(R.transition.slide_right)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentOtpBinding.inflate(inflater, container, false)
+        loadingDialog = IonAlert(requireContext(), IonAlert.PROGRESS_TYPE)
+            .setSpinKit("Circle")
+            .setSpinColor("#FFBD4A")
         return binding.root
     }
 
@@ -45,7 +76,7 @@ class OtpFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         verificationCallback()
         arguments?.let {
-            val phoneNumber =
+            phoneNumber =
                 StringBuilder().append("+62").append(OtpFragmentArgs.fromBundle(it).nohp).toString()
             if (phoneNumber.isNotEmpty()) {
                 startTimer()
@@ -60,17 +91,15 @@ class OtpFragment : Fragment() {
 
             with(binding) {
                 txtPhone.text = getString(R.string.otp_desc, phoneNumber)
-                otpView.requestFocus()
+                tvOtpPin.requestFocus()
                 showSoftKeyboard()
-                otpView.setOtpCompletionListener {
-                    val credential = PhoneAuthProvider.getCredential(verificationId!!, it)
+                tvOtpPin.setOtpCompletionListener { code ->
+                    hideSoftKeyboard()
+                    val credential = PhoneAuthProvider.getCredential(verificationId!!, code)
                     signInWithPhoneAuthCredential(credential)
                 }
                 btnChangeNumber.setOnClickListener {
-                    val action = OtpFragmentDirections.actionOtpFragmentToPhoneFragment(
-                        TYPE_REGISTER
-                    )
-                    findNavController().navigate(action)
+                    findNavController().navigate(R.id.action_otpFragment_to_phoneFragment)
                 }
                 btnKirimUlang.setOnClickListener {
                     if (phoneNumber.isNotEmpty()) {
@@ -80,6 +109,40 @@ class OtpFragment : Fragment() {
                 }
             }
         }
+        observableData()
+    }
+
+    private fun observableData() {
+        authViewModel.login.observe(viewLifecycleOwner, { response ->
+            when (response) {
+                is Resource.Success -> {
+                    lifecycleScope.launch {
+                        if (response.value.message.startsWith("phone")) {
+                            findNavController().navigate(R.id.action_otpFragment_to_signUpFragment)
+                        } else {
+                            localProperties.saveApiToken(KEY_API_TOKEN, response.value.jwt)
+                            localProperties.saveIdDriver(KEY_ID_DRIVER, response.value.data.id)
+                            localProperties.saveFcm(KEY_FCM_TOKEN, response.value.data.fcm)
+                            startActivity(Intent(requireContext(), HomeActivity::class.java))
+                            requireActivity().finish()
+
+                        }
+                    }
+
+
+                }
+                is Resource.Error -> {
+                    handleAuth(response)
+                }
+
+                is Resource.Loading -> {
+                    when (response.isLoading) {
+                        true -> loadingDialog.show()
+                        false -> loadingDialog.dismiss()
+                    }
+                }
+            }
+        })
     }
 
     override fun onPause() {
@@ -106,30 +169,58 @@ class OtpFragment : Fragment() {
         firebaseAuth.signInWithCredential(credential)
             .addOnCompleteListener(requireActivity()) { task: Task<AuthResult> ->
                 if (task.isSuccessful) {
-                    showToast("Success", FancyToast.SUCCESS)
+                    timer?.cancel()
+                    checkPhone()
                 } else {
-                    binding.otpView.text = null
+                    binding.tvOtpPin.text = null
                     if (task.exception is FirebaseAuthInvalidCredentialsException) {
                         showToast("Kode OTP Salah!", FancyToast.ERROR)
                     }
                 }
-            }.addOnFailureListener {
-                Toast.makeText(requireContext(), "Error!", Toast.LENGTH_LONG).show()
+            }.addOnFailureListener { e ->
+                when (e) {
+                    is FirebaseAuthInvalidCredentialsException -> {
+                        showToast("Kode OTP Salah!", FancyToast.ERROR)
+                    }
+                    is FirebaseTooManyRequestsException -> {
+                        // The SMS quota for the project has been exceeded
+                        showToast(
+                            "The SMS quota for the project has been exceeded",
+                            FancyToast.ERROR
+                        )
+                    }
+                    else -> {
+                        showToast("Gagal verifikasi OTP! ${e.message}", FancyToast.ERROR)
+                    }
+                }
             }
+    }
+
+    private fun checkPhone() {
+        //getting fcm token
+        FirebaseMessaging.getInstance().token
+            .addOnSuccessListener { token ->
+                val noHp = phoneNumber.replace("+62", "")
+                authViewModel.loginDriver(LoginData(token, "0$noHp"))
+            }
+            .addOnFailureListener {
+                showToast("Login Error! Please try again later!", FancyToast.ERROR)
+            }
+
     }
 
     private fun verificationCallback() {
         callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                binding.otpView.setText(credential.smsCode)
+                binding.tvOtpPin.setText(credential.smsCode)
                 signInWithPhoneAuthCredential(credential)
             }
 
             override fun onVerificationFailed(e: FirebaseException) {
                 binding.btnChangeNumber.show()
                 timer?.cancel()
-                binding.otpView.text = null
-                binding.otpView.isEnabled = false
+                binding.tvOtpPin.text = null
+                binding.tvOtpPin.isEnabled = false
                 showToast("Gagal mengirim kode OTP", FancyToast.ERROR)
                 if (e is FirebaseAuthInvalidCredentialsException) {
                     showToast("No HP yang anda masukkan salah!", FancyToast.ERROR)

@@ -51,7 +51,7 @@
             android:id="@+id/camera_capture_button"
             android:layout_width="92dp"
             android:layout_height="92dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="24dp"
             android:scaleType="fitCenter"
             android:background="@drawable/ic_shutter" />
     </LinearLayout>

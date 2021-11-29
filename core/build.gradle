@@ -1,22 +1,27 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'kotlin-parcelize'
+    id 'dagger.hilt.android.plugin'
 }
 apply from: '../shared_dependencies.gradle'
 
 dependencies {
-    implementation 'androidx.exifinterface:exifinterface:1.2.0'
+
 }
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        minSdkVersion 22
+        minSdkVersion 24
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-
+        buildConfigField "String", "BASE_URL", "\"http://34.124.182.136/api/v1/\""
+        buildConfigField "String", "MAPS_API_KEY", "\"AIzaSyBgVAMRmAbUDjMIkpgsfZO-89zf12RBkEs\""
+        buildConfigField "String", "BASE_MAPS_URL", "\"https://maps.googleapis.com/maps/api/\""
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -33,5 +38,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+
+    buildFeatures {
+        viewBinding true
     }
 }

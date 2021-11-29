@@ -9,9 +9,6 @@ import androidx.annotation.ColorInt
 import app.proyekakhir.driverapp.R
 import kotlin.math.roundToInt
 
-/**
- * This class draws a background with a hole in the middle of it.
- */
 class ViewFinderBackground(context: Context, attrs: AttributeSet?) : View(context, attrs) {
     private var viewFinderRect: Rect? = null
     private var onDrawListener: (() -> Unit)? = null

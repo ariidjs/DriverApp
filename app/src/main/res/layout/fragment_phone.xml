@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/orange2"
     android:orientation="vertical"
     tools:context=".ui.auth.PhoneFragment">
 
@@ -36,7 +35,7 @@
         android:padding="14dp"
         android:text="@string/phone_desc"
         android:textAlignment="center"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -58,7 +57,7 @@
             android:layout_gravity="center"
             android:layout_margin="2dp"
             android:text="+62"
-            android:textColor="@android:color/white"
+            android:textColor="@android:color/black"
             android:textSize="18sp"
             android:textStyle="italic" />
 
@@ -74,6 +73,7 @@
             app:boxCornerRadiusTopEnd="10dp"
             app:boxCornerRadiusTopStart="10dp"
             app:boxStrokeColor="@color/orange2"
+
             app:hintEnabled="false"
             app:hintTextColor="@color/orange2">
 
@@ -90,16 +90,27 @@
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_verifikasi"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="match_parent"
+<!--    <com.google.android.material.button.MaterialButton-->
+<!--        android:id="@+id/btn_verifikasi"-->
+<!--        style="@style/Widget.MaterialComponents.Button.OutlinedButton"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:text="@string/verifikasi"-->
+<!--        android:textStyle="bold"-->
+<!--        android:textColor="@android:color/white"-->
+<!--        app:strokeColor="@android:color/white" />-->
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_verifikasi"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="16dp"
-        android:text="@string/verifikasi"
-        android:textStyle="bold"
-        android:textColor="@android:color/white"
-        app:strokeColor="@android:color/white" />
+        android:layout_margin="16dp"
+        app:backgroundTint="@color/orange2"
+        app:srcCompat="@drawable/ic_forward_24"
+        app:tint="@android:color/white"
+        android:layout_gravity="end" />
+
 </LinearLayout>

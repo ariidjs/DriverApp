@@ -28,10 +28,11 @@ import androidx.navigation.fragment.findNavController
 import app.proyekakhir.core.util.*
 import app.proyekakhir.core.util.Constants.ANIMATION_FAST_MILLIS
 import app.proyekakhir.core.util.Constants.ANIMATION_SLOW_MILLIS
+import app.proyekakhir.core.util.Constants.KEY_PATH_KTP
+import app.proyekakhir.core.util.Constants.KEY_PATH_STNK
 import app.proyekakhir.driverapp.R
 import app.proyekakhir.driverapp.databinding.FragmentRegionCameraBinding
 import com.google.common.util.concurrent.ListenableFuture
-import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
@@ -58,7 +59,7 @@ class RegionCameraFragment : Fragment() {
             var isGranted = true
             if (!grant) isGranted = false
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 when {
                     isGranted -> {
                         connectCamera()
@@ -110,15 +111,33 @@ class RegionCameraFragment : Fragment() {
     }
 
     private fun sendImage(croppedBitmap: Bitmap) {
-        lifecycleScope.launch(Default) {
+        lifecycleScope.launch(IO) {
             val path = tempFileImage(croppedBitmap, UUID.randomUUID().toString())
             lifecycleScope.launch(Main) {
-                Log.i("TAG", "sendImage: $path")
                 if (path != null) {
-                    findNavController().navigate(R.id.action_regionCameraFragment_to_signUpFragment)
+                    when (RegionCameraFragmentArgs.fromBundle(requireArguments()).type) {
+                        KEY_PATH_STNK -> {
+                            val action =
+                                RegionCameraFragmentDirections.actionRegionCameraFragmentToPhotoFragment(
+                                    path, KEY_PATH_STNK
+                                )
+                            findNavController().navigate(action)
+                        }
+                        KEY_PATH_KTP -> {
+                            val action =
+                                RegionCameraFragmentDirections.actionRegionCameraFragmentToPhotoFragment(
+                                    path, KEY_PATH_KTP
+                                )
+                            findNavController().navigate(action)
+                        }
+                    }
                 }
             }
         }
+    }
+
+    private fun stopPreview() {
+        cameraProviderFuture?.get()?.unbind(preview)
     }
 
     override fun onDestroyView() {
@@ -133,6 +152,7 @@ class RegionCameraFragment : Fragment() {
         binding.viewFinder.post {
             binding.cameraCaptureButton.setOnClickListener {
                 // Get a stable reference of the modifiable image capture use case
+
                 binding.cameraCaptureButton.hide()
                 imageCapture?.let { imageCapture ->
 
@@ -166,7 +186,7 @@ class RegionCameraFragment : Fragment() {
                             })
                     }
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
                         // Display flash animation to indicate that photo was captured
                         binding.root.postDelayed({
@@ -220,7 +240,6 @@ class RegionCameraFragment : Fragment() {
                         .setTargetAspectRatio(screenAspectRatio)
                         .setTargetRotation(binding.viewFinder.display.rotation)
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_BLOCK_PRODUCER)
-                        .setImageQueueDepth(10)
                         .build()
                         .also {
                             it.setAnalyzer(cameraExecutor, { imageProxy ->

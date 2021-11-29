@@ -3,6 +3,8 @@ plugins {
     id 'kotlin-android'
     id 'com.google.gms.google-services'
     id 'androidx.navigation.safeargs.kotlin'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 apply from: '../shared_dependencies.gradle'
 android {
@@ -11,11 +13,11 @@ android {
 
     defaultConfig {
         applicationId "app.proyekakhir.driverapp"
-        minSdkVersion 22
+        minSdkVersion 24
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-
+        buildConfigField "String", "IMG_URL", "\"http://34.124.182.136/images\""
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -39,6 +41,8 @@ android {
 
 dependencies {
     implementation project(":core")
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 

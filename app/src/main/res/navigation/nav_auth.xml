@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_auth"
-    app:startDestination="@id/signUpFragment">
+    app:startDestination="@id/loginFragment">
 
     <fragment
         android:id="@+id/loginFragment"
@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_loginFragment_to_phoneFragment"
             app:destination="@id/phoneFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
     </fragment>
     <fragment
         android:id="@+id/phoneFragment"
@@ -22,9 +25,6 @@
         <action
             android:id="@+id/action_phoneFragment_to_otpFragment"
             app:destination="@id/otpFragment" />
-        <argument
-            android:name="type"
-            app:argType="integer" />
         <action
             android:id="@+id/action_phoneFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
@@ -36,9 +36,6 @@
         android:label="fragment_otp"
         tools:layout="@layout/fragment_otp">
 
-        <argument
-            android:name="type"
-            app:argType="integer" />
         <argument
             android:name="nohp"
             app:argType="string" />
@@ -53,7 +50,21 @@
         android:id="@+id/signUpFragment"
         android:name="app.proyekakhir.driverapp.ui.auth.SignUpFragment"
         android:label="fragment_sign_up"
-        tools:layout="@layout/fragment_sign_up" >
+        tools:layout="@layout/fragment_sign_up">
+
+        <argument
+            android:name="type"
+            android:defaultValue="0"
+            app:argType="integer" />
+
+        <argument
+            android:name="path"
+            android:defaultValue="null"
+            app:nullable="true"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_signUpFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
         <action
             android:id="@+id/action_signUpFragment_to_regionCameraFragment"
             app:destination="@id/regionCameraFragment" />
@@ -63,8 +74,34 @@
         android:name="app.proyekakhir.driverapp.ui.camera.RegionCameraFragment"
         android:label="fragment_region_camera"
         tools:layout="@layout/fragment_region_camera" >
+
+        <argument
+            android:name="type"
+            android:defaultValue="0"
+            app:argType="integer" />
+
         <action
-            android:id="@+id/action_regionCameraFragment_to_signUpFragment"
+            android:id="@+id/action_regionCameraFragment_to_photoFragment"
+            app:destination="@id/photoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/photoFragment"
+        android:name="app.proyekakhir.driverapp.ui.camera.PhotoFragment"
+        android:label="fragment_photo"
+        tools:layout="@layout/fragment_photo" >
+
+        <argument
+            android:name="path"
+            android:defaultValue="null"
+            app:nullable="true"
+            app:argType="string" />
+
+        <argument
+            android:name="type"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_photoFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
     </fragment>
 </navigation>

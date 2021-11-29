@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_key_notif" translatable="false">key_notif</string>
+    <string name="pref_key_notify" translatable="false">key_notify</string>
+    <string name="pref_key_notif_duration" translatable="false">key_duration</string>
+    <string-array name="sound">
+        <item>Sound 1</item>
+        <item>Sound 2</item>
+        <item>Sound 3</item>
+    </string-array>
+
+    <string-array name="sound_duration">
+        <item>2 Detik</item>
+        <item>5 Detik</item>
+        <item>10 Detik</item>
+        <item>15 Detik</item>
+    </string-array>
+
+    <string name="pref_sound1">orderanmasuk</string>
+    <string name="pref_sound2">halo_orderan</string>
+    <string name="pref_sound3">halo_cuan</string>
+
+    <string name="pref_duration_2">2000</string>
+    <string name="pref_duration_5">5000</string>
+    <string name="pref_duration_10">10000</string>
+    <string name="pref_duration_15">15000</string>
+
+
+    <string-array name="sound_value">
+        <item>@string/pref_sound1</item>
+        <item>@string/pref_sound2</item>
+        <item>@string/pref_sound3</item>
+    </string-array>
+
+    <string-array name="duration_value">
+        <item>@string/pref_duration_2</item>
+        <item>@string/pref_duration_5</item>
+        <item>@string/pref_duration_10</item>
+        <item>@string/pref_duration_15</item>
+    </string-array>
+</resources>

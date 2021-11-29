@@ -41,4 +41,24 @@
     <string name="go_online">Go Online</string>
     <string name="online_status">Anda Online</string>
     <string name="offline_status">Anda Offline</string>
+    <string name="nik">NIK</string>
+    <string name="jenis_kelamin">Jenis Kelamin</string>
+    <string name="no_kendaraan">No Kendaraan</string>
+    <string name="silahkan_lengkapi_data_dibawah">Silahkan lengkapi data dibawah</string>
+    <string name="nomor_stnk">Nomor STNK</string>
+    <string name="akun_status_pending">Akun anda masih status pending silahkan tunggu aktivasi dari admin</string>
+    <string name="akun_status_banned">Akun anda telah dibanned, untuk informasi selanjutnya silahkan hubungi admin</string>
+
+    <string-array name="jk">
+        <item>Perempuan</item>
+        <item>Laki - Laki</item>
+    </string-array>
+
+    <string-array name="bank">
+        <item>BRI</item>
+        <item>BNI</item>
+        <item>Mandiri</item>
+        <item>BCA</item>
+        <item>BPD</item>
+    </string-array>
 </resources>
