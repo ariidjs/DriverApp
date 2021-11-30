@@ -9,7 +9,6 @@ import app.proyekakhir.core.data.source.remote.response.transaction.HistoryRespo
 import app.proyekakhir.core.data.source.remote.response.transaction.TransactionResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.Call
 import retrofit2.http.*
 
 interface ApiInterface {
@@ -97,4 +96,11 @@ interface ApiInterface {
         @Part("type") type: RequestBody,
         @Part image: MultipartBody.Part,
     ): DepositResponse
+
+    @GET("driver/detailTransaction/{noTrans}")
+    suspend fun getDetailTrans(
+        @Header("Authorization") token: String,
+        @Header("fcm") fcm: String,
+        @Path("noTrans") noTrans: String
+    ): TransactionResponse
 }

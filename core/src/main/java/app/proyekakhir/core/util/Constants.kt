@@ -3,8 +3,6 @@ package app.proyekakhir.core.util
 import app.proyekakhir.core.data.source.local.LocalProperties
 
 object Constants {
-    const val TYPE_REGISTER = 1
-    const val TYPE_FORGOT_PASSWORD = 2
     const val KEY_PATH_KTP = 1
     const val KEY_PATH_STNK = 2
     const val TIMER_VALUE = 120000L

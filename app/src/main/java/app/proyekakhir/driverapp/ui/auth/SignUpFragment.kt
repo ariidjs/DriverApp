@@ -118,7 +118,6 @@ class SignUpFragment : Fragment(), AdapterView.OnItemClickListener {
                     progressDialog.dismiss()
                 }
                 is Resource.Loading -> {
-                    Log.i("TAGG", "observableData: ${response.progress} ")
                     progressDialog.progress = response.progress!!
                     progressDialog.setMessage(response.message)
                 }

@@ -43,4 +43,8 @@ interface MyUseCase {
     suspend fun getDirectionCustomer(directionData: DirectionData): Flow<Resource<DirectionResponse>>
 
     suspend fun depositOrWithDraw(depositInput: DepositInput): Flow<Resource<DepositResponse>>
+
+    suspend fun getDetailTrans(
+        noTrans: String
+    ): Flow<Resource<TransactionResponse>>
 }

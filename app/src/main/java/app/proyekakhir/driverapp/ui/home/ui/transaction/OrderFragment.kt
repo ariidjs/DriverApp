@@ -26,7 +26,10 @@ class OrderFragment : BottomSheetDialogFragment() {
 
         arguments?.let {
             val data = OrderFragmentArgs.fromBundle(it).detailTransaction
-            setData(data)
+            if (!data.equals(null)) {
+                setData(data)
+            }
+
         }
         return dialog
     }

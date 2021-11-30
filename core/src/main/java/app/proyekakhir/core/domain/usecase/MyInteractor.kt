@@ -77,6 +77,18 @@ class MyInteractor(
         )
     }
 
+    override suspend fun getDetailTrans(
+        noTrans: String
+    ): Flow<Resource<TransactionResponse>> {
+        return myRepository.getDetailTrans(
+            AuthData(
+                localProperties.apiToken!!,
+                localProperties.fcmToken!!
+            ),
+            noTrans
+        )
+    }
+
     override suspend fun getAccount(): Flow<Resource<AccountResponse>> {
         return myRepository.getAccount(
             AuthData(

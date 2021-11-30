@@ -49,4 +49,9 @@ interface IMyRepository {
         authData: AuthData,
         deposit: Deposit
     ): Flow<Resource<DepositResponse>>
+
+    suspend fun getDetailTrans(
+        authData: AuthData,
+        noTrans: String
+    ): Flow<Resource<TransactionResponse>>
 }

@@ -157,6 +157,11 @@ class RemoteDataSource(
         )
     }
 
+    suspend fun getDetailTrans(authData: AuthData, noTrans: String) = flowApiCall {
+        apiInterface.getDetailTrans("Bearer " + authData.token, authData.fcm, noTrans)
+    }
+
+
     /*
     Progress Upload
      */

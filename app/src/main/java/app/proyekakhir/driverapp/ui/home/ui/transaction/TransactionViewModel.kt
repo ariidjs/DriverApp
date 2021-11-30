@@ -1,6 +1,9 @@
 package app.proyekakhir.driverapp.ui.home.ui.transaction
 
-import androidx.lifecycle.*
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import app.proyekakhir.core.data.Resource
 import app.proyekakhir.core.data.source.remote.response.transaction.HistoryResponse
 import app.proyekakhir.core.data.source.remote.response.transaction.TransactionResponse
@@ -45,6 +48,15 @@ class TransactionViewModel(private val myUseCase: MyUseCase) : ViewModel() {
         viewModelScope.launch {
             history.addSource(myUseCase.getHistory().asLiveData()) {
                 history.value = it
+            }
+        }
+    }
+
+    val detail = MediatorLiveData<Resource<TransactionResponse>>()
+    fun getDetail(noTrans: String) {
+        viewModelScope.launch {
+            detail.addSource(myUseCase.getDetailTrans(noTrans).asLiveData()) {
+                detail.value = it
             }
         }
     }

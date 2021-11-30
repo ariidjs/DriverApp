@@ -23,7 +23,11 @@
         android:id="@+id/nav_history"
         android:name="app.proyekakhir.driverapp.ui.home.ui.history.HistoryFragment"
         android:label="fragment_history"
-        tools:layout="@layout/fragment_history" />
+        tools:layout="@layout/fragment_history">
+        <action
+            android:id="@+id/action_nav_history_to_detailFragment"
+            app:destination="@id/detailFragment" />
+    </fragment>
     <dialog
         android:id="@+id/incomingFragment"
         android:name="app.proyekakhir.driverapp.ui.home.ui.transaction.IncomingFragment"
@@ -33,24 +37,25 @@
 
         <argument
             android:name="transactionMessage"
-            app:argType="app.proyekakhir.core.domain.model.transaction.MessageData"/>
+            app:argType="app.proyekakhir.core.domain.model.transaction.MessageData" />
 
     </dialog>
     <dialog
         android:id="@+id/orderFragment"
         android:name="app.proyekakhir.driverapp.ui.home.ui.transaction.OrderFragment"
         android:label="fragment_order"
-        tools:layout="@layout/fragment_order" >
+        tools:layout="@layout/fragment_order">
 
         <argument
             android:name="detailTransaction"
-            app:argType="app.proyekakhir.core.data.source.remote.response.transaction.TransactionResponse"/>
+            app:argType="app.proyekakhir.core.data.source.remote.response.transaction.TransactionResponse" />
+
     </dialog>
     <fragment
         android:id="@+id/nav_settings"
         android:name="app.proyekakhir.driverapp.ui.home.ui.settings.SettingFragment"
         android:label="fragment_setting"
-        tools:layout="@layout/fragment_setting" >
+        tools:layout="@layout/fragment_setting">
         <action
             android:id="@+id/action_nav_settings_to_balanceFragment"
             app:destination="@id/balanceFragment" />
@@ -62,7 +67,7 @@
         android:id="@+id/balanceFragment"
         android:name="app.proyekakhir.driverapp.ui.home.ui.balance.BalanceFragment"
         android:label="fragment_balance"
-        tools:layout="@layout/fragment_balance" >
+        tools:layout="@layout/fragment_balance">
         <action
             android:id="@+id/action_balanceFragment_to_depositFragment"
             app:destination="@id/depositFragment" />
@@ -73,15 +78,27 @@
         android:id="@+id/depositFragment"
         android:name="app.proyekakhir.driverapp.ui.home.ui.balance.DepositFragment"
         android:label="fragment_deposit"
-        tools:layout="@layout/fragment_deposit" >
+        tools:layout="@layout/fragment_deposit">
 
         <argument
             android:name="type"
-            app:argType="integer"/>
+            app:argType="integer" />
     </dialog>
     <fragment
         android:id="@+id/notificationFragment2"
         android:name="app.proyekakhir.driverapp.ui.home.ui.settings.NotificationFragment"
         android:label="fragment_notification"
         tools:layout="@layout/fragment_notification" />
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="app.proyekakhir.driverapp.ui.home.ui.transaction.DetailFragment"
+        android:label="DetailFragment">
+
+        <argument
+            android:name="noTrans"
+            app:argType="string" />
+        <argument
+            android:name="idStore"
+            app:argType="integer" />
+    </fragment>
 </navigation>

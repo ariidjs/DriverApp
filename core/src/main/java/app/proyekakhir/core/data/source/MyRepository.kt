@@ -49,4 +49,9 @@ class MyRepository(
         authData: AuthData,
         deposit: Deposit
     ) = remoteDataSource.depositOrWithDraw(authData, deposit)
+
+    override suspend fun getDetailTrans(
+        authData: AuthData,
+        noTrans: String
+    ) = remoteDataSource.getDetailTrans(authData, noTrans)
 }

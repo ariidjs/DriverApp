@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.navigation.fragment.findNavController
 import app.proyekakhir.core.data.Resource
 import app.proyekakhir.core.data.source.remote.response.transaction.HistoryData
 import app.proyekakhir.core.ui.BaseFragment
@@ -51,8 +52,11 @@ class HistoryFragment : BaseFragment() {
     private fun setData(data: List<HistoryData>) {
         with(binding) {
             rvHistory.adapter = HistoryAdapter {
-                Toast.makeText(requireContext(), "Click ${it.notransaksi}", Toast.LENGTH_SHORT)
-                    .show()
+                val action = HistoryFragmentDirections.actionNavHistoryToDetailFragment(
+                    it.notransaksi,
+                    it.id_store
+                )
+                findNavController().navigate(action)
             }.also { it.items = data }
         }
     }

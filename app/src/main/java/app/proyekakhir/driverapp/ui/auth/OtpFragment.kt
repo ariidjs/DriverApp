@@ -7,13 +7,12 @@ import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.transition.TransitionInflater
 import app.proyekakhir.core.data.Resource
-import app.proyekakhir.core.data.source.local.LocalProperties
 import app.proyekakhir.core.domain.model.auth.LoginData
+import app.proyekakhir.core.ui.BaseFragment
 import app.proyekakhir.core.util.*
 import app.proyekakhir.core.util.Constants.KEY_API_TOKEN
 import app.proyekakhir.core.util.Constants.KEY_FCM_TOKEN
@@ -29,26 +28,20 @@ import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
 import com.google.firebase.messaging.FirebaseMessaging
 import com.shashank.sony.fancytoastlib.FancyToast
-import dagger.hilt.android.AndroidEntryPoint
 import id.ionbit.ionalert.IonAlert
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 
-@AndroidEntryPoint
-class OtpFragment : Fragment() {
+class OtpFragment : BaseFragment() {
     private var _binding: FragmentOtpBinding? = null
     private lateinit var loadingDialog: IonAlert
     private val binding get() = _binding!!
     private var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks? = null
     private var resendToken: PhoneAuthProvider.ForceResendingToken? = null
     private val firebaseAuth: FirebaseAuth by inject()
-    @Inject
-    lateinit var localProperties: LocalProperties
     private var timer: CountDownTimer? = null
     private var verificationId: String? = null
     private val authViewModel: AuthViewModel by viewModel()
@@ -125,7 +118,6 @@ class OtpFragment : Fragment() {
                             localProperties.saveFcm(KEY_FCM_TOKEN, response.value.data.fcm)
                             startActivity(Intent(requireContext(), HomeActivity::class.java))
                             requireActivity().finish()
-
                         }
                     }
 
@@ -137,8 +129,8 @@ class OtpFragment : Fragment() {
 
                 is Resource.Loading -> {
                     when (response.isLoading) {
-                        true -> loadingDialog.show()
-                        false -> loadingDialog.dismiss()
+                        true -> showLoading()
+                        false -> hideLoading()
                     }
                 }
             }
