@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import app.proyekakhir.core.util.Constants.KEY_API_TOKEN
 import app.proyekakhir.core.util.Constants.KEY_FCM_TOKEN
 import app.proyekakhir.core.util.Constants.KEY_ID_DRIVER
+import app.proyekakhir.core.util.Constants.KEY_PHONE
 import app.proyekakhir.core.util.Constants.PREF_TAG
 
 class LocalProperties constructor(context: Context) {
@@ -18,13 +19,17 @@ class LocalProperties constructor(context: Context) {
 
     val idDriver = sharedPreferences.getInt(KEY_ID_DRIVER, 0)
 
+    val phone = sharedPreferences.getString(KEY_PHONE, "")
+
     fun saveApiToken(key: String, value: String) = editor.putString(key, value).apply()
+
+    fun savePhone(key: String, value: String) = editor.putString(key, value).apply()
 
     fun saveIdDriver(key: String, value: Int) = editor.putInt(key, value).apply()
 
     fun saveFcm(key: String, value: String) = editor.putString(key, value).apply()
 
     fun clearSession() {
-        editor.clear()
+        editor.clear().apply()
     }
 }

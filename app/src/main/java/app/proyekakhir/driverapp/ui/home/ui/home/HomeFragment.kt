@@ -504,6 +504,26 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
 
     private fun updateStatus(status: Int) {
         currentRef.child("status").setValue(status)
+        val cancellationToken = CancellationTokenSource()
+
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        fusedLocationProviderClient.getCurrentLocation(
+            LocationRequest.PRIORITY_HIGH_ACCURACY,
+            cancellationToken.token
+        ).addOnSuccessListener {
+            currentRef.child("coordinate").setValue(StringBuilder().append(it?.latitude.toString()).append(", ")
+                .append(it?.longitude.toString()).toString())
+        }
+
     }
 
     override fun onDestroy() {

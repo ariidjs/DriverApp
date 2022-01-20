@@ -67,6 +67,22 @@ fun Fragment.showPermissionSnackBar(
     snackBar.show()
 }
 
+fun Activity.showPermissionSnackBar(
+    snackStrId: Int,
+    actionStrId: Int = 0,
+    listener: View.OnClickListener? = null
+) {
+    val snackBar = Snackbar.make(
+        findViewById(android.R.id.content),
+        getString(snackStrId),
+        Snackbar.LENGTH_INDEFINITE
+    )
+    if (actionStrId != 0 && listener != null) {
+        snackBar.setAction(getString(actionStrId), listener)
+    }
+    snackBar.show()
+}
+
 fun Fragment.tempFileImage(
     bitmap: Bitmap,
     name: String
@@ -100,12 +116,11 @@ fun decodeUriToBitmap(mContext: Context, sendUri: Uri): Bitmap {
     return getBitmap!!
 }
 
-fun tempFileImage(
-    context: Context,
+fun Activity.tempFileImage(
     bitmap: Bitmap,
     name: String
 ): String? {
-    val outputDir = context.cacheDir
+    val outputDir = applicationContext.cacheDir
     val imageFile = File(outputDir, "$name.png")
     val os: OutputStream
     try {
@@ -114,7 +129,7 @@ fun tempFileImage(
         os.flush()
         os.close()
     } catch (e: Exception) {
-        Log.e(context.javaClass.simpleName, "Error writing file", e)
+        Log.e(applicationContext.javaClass.simpleName, "Error writing file", e)
     }
     return imageFile.absolutePath
 }

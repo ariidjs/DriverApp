@@ -2,15 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="app.proyekakhir.driverapp">
     <!-- Declare features -->
-    <uses-feature android:name="android.hardware.camera" />
-    <!-- Declare permissions -->
+    <uses-feature android:name="android.hardware.camera" /> <!-- Declare permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
@@ -24,6 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DriverApp"
         android:usesCleartextTraffic="true">
+        <activity android:name=".ui.camera.RegionCameraActivity"></activity>
         <activity android:name=".ui.auth.MainActivity" />
         <activity android:name=".ui.auth.StatusActivity" />
         <activity android:name=".ui.home.HomeActivity" />
@@ -34,7 +34,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

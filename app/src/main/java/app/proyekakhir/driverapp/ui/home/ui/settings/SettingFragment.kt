@@ -14,11 +14,13 @@ import app.proyekakhir.driverapp.R
 import app.proyekakhir.driverapp.databinding.FragmentSettingBinding
 import app.proyekakhir.driverapp.ui.home.ui.home.HomeViewModel
 import app.proyekakhir.driverapp.util.handleAuth
+import app.proyekakhir.driverapp.util.logout
 import app.proyekakhir.driverapp.util.showLogoutDialog
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.database.FirebaseDatabase
+import id.ionbit.ionalert.IonAlert
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -77,4 +79,5 @@ class SettingFragment : BaseFragment() {
             findNavController().navigate(R.id.action_nav_settings_to_notificationFragment2)
         }
     }
+
 }

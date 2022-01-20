@@ -6,8 +6,8 @@ object Constants {
     const val KEY_PATH_KTP = 1
     const val KEY_PATH_STNK = 2
     const val TIMER_VALUE = 120000L
-    const val DRIVER_AVAILABLE = 1
-    const val DRIVER_NOT_AVAILABLE = 0
+    const val DRIVER_AVAILABLE = 0
+    const val DRIVER_NOT_AVAILABLE = 1
     const val NOTIFICATION_CHANNEL_ID = "01"
     const val NOTIFICATION_CHANNEL_NAME = "CH1"
     const val TYPE_DEPOSIT = 1
@@ -41,6 +41,7 @@ object Constants {
     const val KEY_API_TOKEN = "key_api_token"
     const val KEY_FCM_TOKEN = "key_fcm_token"
     const val KEY_ID_DRIVER = "key_id"
+    const val KEY_PHONE = "key_phone"
 
 
     //status order

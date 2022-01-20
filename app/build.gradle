@@ -17,7 +17,7 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-        buildConfigField "String", "IMG_URL", "\"http://34.124.182.136/images\""
+        buildConfigField "String", "IMG_URL", "\"http://34.221.228.202:8081/images\""
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

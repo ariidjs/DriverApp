@@ -17,6 +17,7 @@ import app.proyekakhir.core.util.*
 import app.proyekakhir.core.util.Constants.KEY_API_TOKEN
 import app.proyekakhir.core.util.Constants.KEY_FCM_TOKEN
 import app.proyekakhir.core.util.Constants.KEY_ID_DRIVER
+import app.proyekakhir.core.util.Constants.KEY_PHONE
 import app.proyekakhir.core.util.Constants.TIMER_VALUE
 import app.proyekakhir.driverapp.R
 import app.proyekakhir.driverapp.databinding.FragmentOtpBinding
@@ -37,7 +38,6 @@ import java.util.concurrent.TimeUnit
 
 class OtpFragment : BaseFragment() {
     private var _binding: FragmentOtpBinding? = null
-    private lateinit var loadingDialog: IonAlert
     private val binding get() = _binding!!
     private var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks? = null
     private var resendToken: PhoneAuthProvider.ForceResendingToken? = null
@@ -59,9 +59,6 @@ class OtpFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentOtpBinding.inflate(inflater, container, false)
-        loadingDialog = IonAlert(requireContext(), IonAlert.PROGRESS_TYPE)
-            .setSpinKit("Circle")
-            .setSpinColor("#FFBD4A")
         return binding.root
     }
 
@@ -101,40 +98,43 @@ class OtpFragment : BaseFragment() {
                     }
                 }
             }
+
+            authViewModel.login.observe(viewLifecycleOwner, { response ->
+                when (response) {
+                    is Resource.Success -> {
+                        lifecycleScope.launch {
+                            if (response.value.message.startsWith("phone")) {
+                                findNavController().navigate(R.id.action_otpFragment_to_signUpFragment)
+                            } else {
+                                localProperties.saveApiToken(KEY_API_TOKEN, response.value.jwt)
+                                localProperties.saveIdDriver(KEY_ID_DRIVER, response.value.data.id)
+                                localProperties.saveFcm(KEY_FCM_TOKEN, response.value.data.fcm)
+                                startActivity(Intent(requireContext(), HomeActivity::class.java))
+                                requireActivity().finish()
+                            }
+                        }
+
+
+                    }
+                    is Resource.Error -> {
+                        handleAuth(response)
+                    }
+
+                    is Resource.Loading -> {
+                        when (response.isLoading) {
+                            true -> showLoading()
+                            false -> hideLoading()
+                        }
+                    }
+                }
+            })
         }
-        observableData()
+
+
     }
 
     private fun observableData() {
-        authViewModel.login.observe(viewLifecycleOwner, { response ->
-            when (response) {
-                is Resource.Success -> {
-                    lifecycleScope.launch {
-                        if (response.value.message.startsWith("phone")) {
-                            findNavController().navigate(R.id.action_otpFragment_to_signUpFragment)
-                        } else {
-                            localProperties.saveApiToken(KEY_API_TOKEN, response.value.jwt)
-                            localProperties.saveIdDriver(KEY_ID_DRIVER, response.value.data.id)
-                            localProperties.saveFcm(KEY_FCM_TOKEN, response.value.data.fcm)
-                            startActivity(Intent(requireContext(), HomeActivity::class.java))
-                            requireActivity().finish()
-                        }
-                    }
 
-
-                }
-                is Resource.Error -> {
-                    handleAuth(response)
-                }
-
-                is Resource.Loading -> {
-                    when (response.isLoading) {
-                        true -> showLoading()
-                        false -> hideLoading()
-                    }
-                }
-            }
-        })
     }
 
     override fun onPause() {
@@ -193,6 +193,7 @@ class OtpFragment : BaseFragment() {
         FirebaseMessaging.getInstance().token
             .addOnSuccessListener { token ->
                 val noHp = phoneNumber.replace("+62", "")
+                localProperties.savePhone(KEY_PHONE, "0$noHp")
                 authViewModel.loginDriver(LoginData(token, "0$noHp"))
             }
             .addOnFailureListener {

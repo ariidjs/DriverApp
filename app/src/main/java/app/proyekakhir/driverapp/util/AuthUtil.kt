@@ -18,6 +18,10 @@ fun checkInputSignUp(binding: FragmentSignUpBinding): Boolean {
             edtNoKendaraan.text
         )&& !TextUtils.isEmpty(edtNoKendaraan.text) && !TextUtils.isEmpty(
             Constants.pathKtp
+        )&& !TextUtils.isEmpty(edtNik.text) && !TextUtils.isEmpty(
+            Constants.pathKtp
+        )&& !TextUtils.isEmpty(edtNoStnk.text) && !TextUtils.isEmpty(
+            Constants.pathKtp
         ) && !TextUtils.isEmpty(
             Constants.pathStnk
         ) && !TextUtils.isEmpty(Constants.pathFormal)
