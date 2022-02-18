@@ -45,6 +45,9 @@
         <action
             android:id="@+id/action_otpFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
+        <action
+            android:id="@+id/action_otpFragment_to_dialogFragment3"
+            app:destination="@id/dialogFragment3" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
@@ -104,4 +107,15 @@
             android:id="@+id/action_photoFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
     </fragment>
+    <dialog
+        android:id="@+id/dialogFragment3"
+        android:name="app.proyekakhir.driverapp.ui.dialog.DialogFragment"
+        android:label="DialogFragment" >
+        <argument
+            android:name="type"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_dialogFragment3_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+    </dialog>
 </navigation>

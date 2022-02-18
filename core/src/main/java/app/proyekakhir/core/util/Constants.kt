@@ -49,4 +49,9 @@ object Constants {
     const val ORDER_VERIFIED = 5
     const val ORDER_FINISHED = 6
 
+
+    //ERROR HANDLE
+    const val ERROR_UNAUTHORIZED = 100
+    const val ERROR_NOT_REGISTER = 101
+
 }

@@ -18,6 +18,11 @@ class MyRepository(
     override suspend fun acceptOrder(authData: AuthData, idTrans: Int) =
         remoteDataSource.acceptOrder(authData, idTrans)
 
+    override suspend fun declineOrder(
+        authData: AuthData,
+        idTrans: Int
+    ) = remoteDataSource.declineOrder(authData, idTrans)
+
     override suspend fun validationCodeStore(
         authData: AuthData,
         idTrans: Int,

@@ -36,7 +36,7 @@
     <string name="settings">Settings</string>
     <string name="no_location_detected">No location detected. Make sure location is enabled on the device.</string>
     <string name="location_setting_unknown">Location settings are inadequate, and cannot be fixed here. Fix in Settings.</string>
-    <string name="setting">Setting</string>
+    <string name="setting">Akun</string>
     <string name="go_offline">Go Offline</string>
     <string name="go_online">Go Online</string>
     <string name="online_status">Anda Online</string>
@@ -48,6 +48,11 @@
     <string name="nomor_stnk">Nomor STNK</string>
     <string name="akun_status_pending">Akun anda masih status pending silahkan tunggu aktivasi dari admin</string>
     <string name="akun_status_banned">Akun anda telah dibanned, untuk informasi selanjutnya silahkan hubungi admin</string>
+    <string name="title_unauth">Kamu keluar dari akunmu</string>
+    <string name="desc_unauth">Maaf ya, ada gangguan sedikit. Masuk lagi, yuk?</string>
+    <string name="btn_unauth">Masuk</string>
+    <string name="title_not_registered">Anda belum terdaftar</string>
+    <string name="desc_not_registered">Gabung yuk, dengan mitra driver kami</string>
 
     <string-array name="jk">
         <item>Perempuan</item>

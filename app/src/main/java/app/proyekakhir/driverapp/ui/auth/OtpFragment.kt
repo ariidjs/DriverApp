@@ -14,6 +14,7 @@ import app.proyekakhir.core.data.Resource
 import app.proyekakhir.core.domain.model.auth.LoginData
 import app.proyekakhir.core.ui.BaseFragment
 import app.proyekakhir.core.util.*
+import app.proyekakhir.core.util.Constants.ERROR_NOT_REGISTER
 import app.proyekakhir.core.util.Constants.KEY_API_TOKEN
 import app.proyekakhir.core.util.Constants.KEY_FCM_TOKEN
 import app.proyekakhir.core.util.Constants.KEY_ID_DRIVER
@@ -22,14 +23,13 @@ import app.proyekakhir.core.util.Constants.TIMER_VALUE
 import app.proyekakhir.driverapp.R
 import app.proyekakhir.driverapp.databinding.FragmentOtpBinding
 import app.proyekakhir.driverapp.ui.home.HomeActivity
-import app.proyekakhir.driverapp.util.handleAuth
+import app.proyekakhir.driverapp.util.handleResponses
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
 import com.google.firebase.messaging.FirebaseMessaging
 import com.shashank.sony.fancytoastlib.FancyToast
-import id.ionbit.ionalert.IonAlert
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -66,6 +66,7 @@ class OtpFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         verificationCallback()
         arguments?.let {
+            binding.tvOtpPin.isEnabled = false
             phoneNumber =
                 StringBuilder().append("+62").append(OtpFragmentArgs.fromBundle(it).nohp).toString()
             if (phoneNumber.isNotEmpty()) {
@@ -104,7 +105,10 @@ class OtpFragment : BaseFragment() {
                     is Resource.Success -> {
                         lifecycleScope.launch {
                             if (response.value.message.startsWith("phone")) {
-                                findNavController().navigate(R.id.action_otpFragment_to_signUpFragment)
+                                val action = OtpFragmentDirections.actionOtpFragmentToDialogFragment3(
+                                    ERROR_NOT_REGISTER)
+                                findNavController().navigate(action)
+
                             } else {
                                 localProperties.saveApiToken(KEY_API_TOKEN, response.value.jwt)
                                 localProperties.saveIdDriver(KEY_ID_DRIVER, response.value.data.id)
@@ -117,7 +121,7 @@ class OtpFragment : BaseFragment() {
 
                     }
                     is Resource.Error -> {
-                        handleAuth(response)
+                        handleResponses(response)
                     }
 
                     is Resource.Loading -> {
@@ -231,6 +235,7 @@ class OtpFragment : BaseFragment() {
                 verificationId = id
                 resendToken = phoneAuthProvider
                 binding.btnKirimUlang.hide()
+                binding.tvOtpPin.isEnabled = true
                 showToast("Kode Terkirim", FancyToast.SUCCESS)
             }
 

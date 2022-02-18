@@ -9,5 +9,5 @@ data class Deposit(
     val saldo: RequestBody,
     val namaBank: RequestBody,
     val type: RequestBody,
-    val image: MultipartBody.Part,
+    val image: MultipartBody.Part? = null,
 )

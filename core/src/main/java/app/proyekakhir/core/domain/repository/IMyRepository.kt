@@ -27,6 +27,8 @@ interface IMyRepository {
 
     suspend fun acceptOrder(authData: AuthData, idTrans: Int): Flow<Resource<TransactionResponse>>
 
+    suspend fun declineOrder(authData: AuthData, idTrans: Int): Flow<Resource<TransactionResponse>>
+
     suspend fun validationCodeStore(
         authData: AuthData,
         idTrans: Int,

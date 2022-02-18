@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_nav_home_to_orderFragment"
             app:destination="@id/orderFragment" />
+        <action
+            android:id="@+id/action_nav_home_to_dialogFragment"
+            app:destination="@id/dialogFragment" />
 
 
     </fragment>
@@ -101,4 +104,13 @@
             android:name="idStore"
             app:argType="integer" />
     </fragment>
+    <dialog
+        android:id="@+id/dialogFragment"
+        android:name="app.proyekakhir.driverapp.ui.dialog.DialogFragment"
+        android:label="DialogFragment">
+
+        <argument
+            android:name="type"
+            app:argType="integer" />
+    </dialog>
 </navigation>

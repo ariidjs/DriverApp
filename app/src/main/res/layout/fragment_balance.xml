@@ -133,7 +133,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="16dp"
-                    android:text="Rp.300.000"
+                    tools:text="Rp.300.000"
                     android:textColor="@color/white"
                     android:textSize="30sp"
                     android:textStyle="bold"

@@ -50,6 +50,15 @@ interface ApiInterface {
         @Field("status") status: Int = 4
     ): TransactionResponse
 
+    @FormUrlEncoded
+    @POST("driver/confirmorder/{idTrans}")
+    suspend fun declineOrder(
+        @Header("Authorization") token: String,
+        @Header("fcm") fcm: String,
+        @Path("idTrans") idTrans: Int,
+        @Field("status") status: Int = 3
+    ): TransactionResponse
+
     @GET("driver/transaction/{idTrans}/{kode}")
     suspend fun verificationCode(
         @Header("Authorization") token: String,
@@ -94,7 +103,7 @@ interface ApiInterface {
         @Part("saldo") saldo: RequestBody,
         @Part("nama_bank") namaBank: RequestBody,
         @Part("type") type: RequestBody,
-        @Part image: MultipartBody.Part,
+        @Part image: MultipartBody.Part?,
     ): DepositResponse
 
     @GET("driver/detailTransaction/{noTrans}")

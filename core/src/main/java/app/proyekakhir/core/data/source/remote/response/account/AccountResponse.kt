@@ -23,5 +23,6 @@ data class AccountData(
     val saldo: Int,
     val status: Int,
     val status_delete: Int,
-    val updated_at: String
+    val updated_at: String,
+    val benefit: Int
 )

@@ -13,14 +13,12 @@ import app.proyekakhir.driverapp.BuildConfig
 import app.proyekakhir.driverapp.R
 import app.proyekakhir.driverapp.databinding.FragmentSettingBinding
 import app.proyekakhir.driverapp.ui.home.ui.home.HomeViewModel
-import app.proyekakhir.driverapp.util.handleAuth
-import app.proyekakhir.driverapp.util.logout
+import app.proyekakhir.driverapp.util.handleResponses
 import app.proyekakhir.driverapp.util.showLogoutDialog
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.database.FirebaseDatabase
-import id.ionbit.ionalert.IonAlert
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -49,7 +47,7 @@ class SettingFragment : BaseFragment() {
                     setData(response.value.data)
                 }
                 is Resource.Error -> {
-                    handleAuth(response)
+                    handleResponses(response)
                 }
                 is Resource.Loading -> {
                     when (response.isLoading) {
@@ -69,6 +67,7 @@ class SettingFragment : BaseFragment() {
         binding.tvAccountPhone.text = data.phone
         binding.tvVehicleNumber.text = data.plat_kendaraan
         binding.tvBalance.text = convertToIDR(data.saldo)
+        binding.tvPendapatan.text = convertToIDR(data.benefit)
         binding.btnLogout.setOnClickListener {
             showLogoutDialog(localProperties, firebaseDatabase)
         }

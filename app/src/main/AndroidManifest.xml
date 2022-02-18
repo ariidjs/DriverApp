@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
     <application
         android:name=".MyApplication"
@@ -23,7 +24,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DriverApp"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.camera.RegionCameraActivity"></activity>
+        <activity
+            android:name=".ui.home.ui.transaction.IncomingActivity"
+            android:launchMode="singleTop"
+            android:showOnLockScreen="true" />
+        <activity android:name=".ui.camera.RegionCameraActivity" />
         <activity android:name=".ui.auth.MainActivity" />
         <activity android:name=".ui.auth.StatusActivity" />
         <activity android:name=".ui.home.HomeActivity" />
@@ -40,12 +45,17 @@
             android:value="@string/google_maps_key" />
 
         <service
-            android:name="app.proyekakhir.core.data.source.remote.network.MessagingService"
+            android:name=".MessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <receiver
+            android:name=".AlarmReceiver"
+            android:enabled="true"
+            android:exported="true" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

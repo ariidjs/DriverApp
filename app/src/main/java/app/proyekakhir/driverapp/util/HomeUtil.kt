@@ -1,10 +1,7 @@
 package app.proyekakhir.driverapp.util
 
 import android.animation.ValueAnimator
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -34,6 +31,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 fun Fragment.updateUIStatus(binding: FragmentHomeBinding, state: Boolean) {
@@ -253,3 +252,4 @@ fun Fragment.showNotificationOrder() {
     val notification = notificationBuilder.build()
     mNotificationManager.notify(0, notification)
 }
+

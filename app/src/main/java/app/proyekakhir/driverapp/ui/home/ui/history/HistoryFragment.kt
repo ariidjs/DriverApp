@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import app.proyekakhir.core.data.Resource
 import app.proyekakhir.core.data.source.remote.response.transaction.HistoryData
@@ -12,7 +11,7 @@ import app.proyekakhir.core.ui.BaseFragment
 import app.proyekakhir.core.ui.HistoryAdapter
 import app.proyekakhir.driverapp.databinding.FragmentHistoryBinding
 import app.proyekakhir.driverapp.ui.home.ui.transaction.TransactionViewModel
-import app.proyekakhir.driverapp.util.handleAuth
+import app.proyekakhir.driverapp.util.handleResponses
 import org.koin.android.ext.android.inject
 
 class HistoryFragment : BaseFragment() {
@@ -37,7 +36,7 @@ class HistoryFragment : BaseFragment() {
                     setData(response.value.data)
                 }
                 is Resource.Error -> {
-                    handleAuth(response)
+                    handleResponses(response)
                 }
                 is Resource.Loading -> {
                     when (response.isLoading) {

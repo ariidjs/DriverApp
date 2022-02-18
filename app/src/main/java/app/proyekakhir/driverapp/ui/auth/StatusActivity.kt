@@ -4,8 +4,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.os.bundleOf
+import app.proyekakhir.core.util.Constants
 import app.proyekakhir.core.util.Constants.EXTRA_STATUS
 import app.proyekakhir.driverapp.R
+import app.proyekakhir.driverapp.ui.dialog.DialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 
 class StatusActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,5 +25,6 @@ class StatusActivity : AppCompatActivity() {
                 findViewById<TextView>(R.id.tv_status_akun).text = getString(R.string.akun_status_banned)
             }
         }
+
     }
 }

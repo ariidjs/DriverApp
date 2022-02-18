@@ -1,11 +1,9 @@
 package app.proyekakhir.driverapp.ui.home.ui.balance
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.transition.TransitionInflater
 import app.proyekakhir.core.data.Resource
@@ -17,8 +15,7 @@ import app.proyekakhir.core.util.Constants.TYPE_WITHDRAW
 import app.proyekakhir.core.util.convertToIDR
 import app.proyekakhir.driverapp.R
 import app.proyekakhir.driverapp.databinding.FragmentBalanceBinding
-import app.proyekakhir.driverapp.util.handleAuth
-import id.ionbit.ionalert.IonAlert
+import app.proyekakhir.driverapp.util.handleResponses
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -53,7 +50,7 @@ class BalanceFragment : BaseFragment() {
                     setData(response.value)
                 }
                 is Resource.Error -> {
-                    handleAuth(response)
+                    handleResponses(response)
                 }
                 is Resource.Loading -> {
                     when (response.isLoading) {

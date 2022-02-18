@@ -13,7 +13,7 @@ import app.proyekakhir.core.util.convertDateTime
 import app.proyekakhir.core.util.convertToIDR
 import app.proyekakhir.driverapp.databinding.FragmentDetailBinding
 import app.proyekakhir.driverapp.util.getAllPrice
-import app.proyekakhir.driverapp.util.handleAuth
+import app.proyekakhir.driverapp.util.handleResponses
 import org.koin.android.ext.android.inject
 
 class DetailFragment : BaseFragment() {
@@ -42,7 +42,7 @@ class DetailFragment : BaseFragment() {
                     setData(response.value)
                 }
                 is Resource.Error -> {
-                    handleAuth(response)
+                    handleResponses(response)
                 }
                 is Resource.Loading -> {
                     when (response.isLoading) {

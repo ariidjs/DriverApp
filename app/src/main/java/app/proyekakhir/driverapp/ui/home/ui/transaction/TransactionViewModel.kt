@@ -22,6 +22,16 @@ class TransactionViewModel(private val myUseCase: MyUseCase) : ViewModel() {
         }
     }
 
+    val decline = MediatorLiveData<Resource<TransactionResponse>>()
+
+    fun declineOrder(idTrans: Int) {
+        viewModelScope.launch {
+            decline.addSource(myUseCase.declineOrder(idTrans).asLiveData()) {
+                accept.value = it
+            }
+        }
+    }
+
     val finish = MediatorLiveData<Resource<TransactionResponse>>()
 
     fun finishOrder(idTrans: Int) {

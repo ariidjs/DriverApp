@@ -61,13 +61,14 @@ class MyInteractor(
     override suspend fun depositOrWithDraw(
         depositInput: DepositInput
     ): Flow<Resource<DepositResponse>> {
+
         val deposit = Deposit(
             createPartFromString(depositInput.nama),
             createPartFromString(depositInput.noRek),
             createPartFromString(depositInput.saldo),
             createPartFromString(depositInput.namaBank),
             createPartFromString(depositInput.type),
-            context.prepareFilePart("image", depositInput.image)
+            if (depositInput.image != null) context.prepareFilePart("image", depositInput.image) else null
         )
         return myRepository.depositOrWithDraw(
             AuthData(
@@ -102,6 +103,15 @@ class MyInteractor(
         idTrans: Int
     ): Flow<Resource<TransactionResponse>> {
         return myRepository.acceptOrder(
+            AuthData(
+                localProperties.apiToken!!,
+                localProperties.fcmToken!!
+            ), idTrans
+        )
+    }
+
+    override suspend fun declineOrder(idTrans: Int): Flow<Resource<TransactionResponse>> {
+        return myRepository.declineOrder(
             AuthData(
                 localProperties.apiToken!!,
                 localProperties.fcmToken!!

@@ -100,6 +100,10 @@ class RemoteDataSource(
         apiInterface.acceptOrder("Bearer " + authData.token, authData.fcm, idTrans)
     }
 
+    suspend fun declineOrder(authData: AuthData, idTrans: Int) = flowApiCall {
+        apiInterface.declineOrder("Bearer " + authData.token, authData.fcm, idTrans)
+    }
+
     suspend fun validationToStore(authData: AuthData, idTrans: Int, code: String) = flowApiCall {
         apiInterface.verificationCode("Bearer " + authData.token, authData.fcm, idTrans, code)
     }

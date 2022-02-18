@@ -25,6 +25,8 @@ interface MyUseCase {
 
     suspend fun acceptOrder(idTrans: Int): Flow<Resource<TransactionResponse>>
 
+    suspend fun declineOrder(idTrans: Int): Flow<Resource<TransactionResponse>>
+
     suspend fun validationCodeToStore(
         idTrans: Int,
         code: String

@@ -159,6 +159,31 @@
             app:srcCompat="@drawable/ic_my_location_24"
             app:tint="@color/orange2" />
 
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_banned"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="@color/orange2"
+            android:visibility="gone"
+            app:cardCornerRadius="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/fab_my_loc"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/fab_my_loc">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="8dp"
+                android:text="Anda belum bisa menerima pesanan baru selama 2 menit karena menolak pesanan sebelumnya"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </androidx.cardview.widget.CardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

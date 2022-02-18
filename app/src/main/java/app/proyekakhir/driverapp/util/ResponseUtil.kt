@@ -1,21 +1,19 @@
 package app.proyekakhir.driverapp.util
 
 import android.content.Intent
-import android.util.Log
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import app.proyekakhir.core.data.Resource
 import app.proyekakhir.core.util.Constants
+import app.proyekakhir.core.util.Constants.ERROR_UNAUTHORIZED
 import app.proyekakhir.core.util.showToast
-import app.proyekakhir.driverapp.ui.auth.MainActivity
 import app.proyekakhir.driverapp.ui.auth.StatusActivity
-import com.github.loadingview.LoadingDialog
+import app.proyekakhir.driverapp.ui.dialog.DialogFragment
 import com.shashank.sony.fancytoastlib.FancyToast
-import com.tommasoberlose.progressdialog.ProgressDialogFragment
-import id.ionbit.ionalert.IonAlert
 import org.json.JSONException
 import org.json.JSONObject
 
-fun Fragment.handleAuth(response: Resource.Error) {
+fun Fragment.handleResponses(response: Resource.Error) {
     when {
         response.isNetworkError -> showToast("Check your network connection", FancyToast.ERROR)
 
@@ -41,9 +39,13 @@ fun Fragment.handleAuth(response: Resource.Error) {
                 val errors = jsonObject.getString("message")
 
                 if (errors.startsWith("authorized failed")) {
-                    startActivity(Intent(requireContext(), MainActivity::class.java))
-                    requireActivity().finish()
-                }else {
+                    val fragment = DialogFragment()
+                    fragment.arguments = bundleOf("type" to ERROR_UNAUTHORIZED)
+                    requireActivity().supportFragmentManager.beginTransaction()
+                        .add(android.R.id.content, fragment, fragment.tag)
+                        .commit()
+
+                } else {
                     showToast(errors, FancyToast.ERROR)
                 }
             } catch (e: JSONException) {
@@ -54,6 +56,4 @@ fun Fragment.handleAuth(response: Resource.Error) {
             showToast("Login Error! Silahkan coba lagi nanti", FancyToast.ERROR)
         }
     }
-
-
 }

@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -27,6 +26,7 @@ import app.proyekakhir.core.util.Constants.TYPE_DEPOSIT
 import app.proyekakhir.core.util.Constants.TYPE_WITHDRAW
 import app.proyekakhir.driverapp.R
 import app.proyekakhir.driverapp.databinding.FragmentDepositBinding
+import app.proyekakhir.driverapp.util.handleResponses
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.iceteck.silicompressorr.FileUtils
 import com.shashank.sony.fancytoastlib.FancyToast
@@ -40,7 +40,6 @@ class DepositFragment : BaseDialogFragment(), AdapterView.OnItemClickListener {
     private var _binding: FragmentDepositBinding? = null
     private val binding get() = _binding!!
     private val balanceViewModel: BalanceViewModel by inject()
-    private lateinit var loadingDialog: IonAlert
     private var namaBank: String = ""
     private var image: String? = null
     private val camera =
@@ -109,11 +108,7 @@ class DepositFragment : BaseDialogFragment(), AdapterView.OnItemClickListener {
                     showToast("Success", FancyToast.SUCCESS)
                 }
                 is Resource.Error -> {
-                    showToast(
-                        response.errorBody?.string()?.contains("message").toString(),
-                        FancyToast.ERROR
-                    )
-
+                    handleResponses(response)
                 }
                 is Resource.Loading -> {
                     when (response.isLoading) {

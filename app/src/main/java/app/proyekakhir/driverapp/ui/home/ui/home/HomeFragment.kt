@@ -16,7 +16,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.navigation.fragment.findNavController
@@ -28,6 +27,7 @@ import app.proyekakhir.core.domain.model.direction.DirectionData
 import app.proyekakhir.core.domain.model.driver.FirebaseData
 import app.proyekakhir.core.domain.model.transaction.MessageData
 import app.proyekakhir.core.ui.BaseFragment
+import app.proyekakhir.core.util.*
 import app.proyekakhir.core.util.Constants.DRIVER_AVAILABLE
 import app.proyekakhir.core.util.Constants.DRIVER_NOT_AVAILABLE
 import app.proyekakhir.core.util.Constants.DRIVER_ONLINE_REFERENCE
@@ -37,10 +37,6 @@ import app.proyekakhir.core.util.Constants.MAPS_ZOOM_LEVEL
 import app.proyekakhir.core.util.Constants.ORDER_ACCEPTED
 import app.proyekakhir.core.util.Constants.ORDER_FINISHED
 import app.proyekakhir.core.util.Constants.ORDER_VERIFIED
-import app.proyekakhir.core.util.collapse
-import app.proyekakhir.core.util.convertToIDR
-import app.proyekakhir.core.util.expand
-import app.proyekakhir.core.util.showToast
 import app.proyekakhir.driverapp.BuildConfig
 import app.proyekakhir.driverapp.R
 import app.proyekakhir.driverapp.databinding.DialogPinLayoutBinding
@@ -63,10 +59,10 @@ import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.*
+import com.google.firebase.database.ktx.getValue
 import com.shashank.sony.fancytoastlib.FancyToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -122,9 +118,6 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
 
     private fun initFirebase() {
         driverLocationRef = firebaseDatabase.getReference(DRIVER_REFERENCE)
-//        currentRef =
-//            firebaseDatabase.getReference(DRIVER_REFERENCE)
-//                .child(localProperties.fcmToken!!.trimSubstring(0, 10))
         currentRef =
             firebaseDatabase.getReference(DRIVER_REFERENCE)
                 .child(localProperties.idDriver.toString())
@@ -135,6 +128,24 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
                     isOnline = true
                     homeViewModel.requestLocation()
                     updateUIStatus(binding, true)
+                    currentRef.child("status").addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.exists()) {
+                                if (snapshot.getValue<Int>() == 3) {
+                                    binding.cardBanned.show()
+                                    binding.btnStatus.isEnabled = false
+                                }else if(snapshot.getValue<Int>() == 0) {
+                                    binding.cardBanned.hide()
+                                    binding.btnStatus.isEnabled = true
+                                }
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            showToast(error.message, FancyToast.ERROR)
+                        }
+
+                    })
                 } else {
                     Log.i("TAGG", "onDataChange: not exists")
                 }
@@ -221,7 +232,7 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
                     setProfile(response.value.data)
                 }
                 is Resource.Error -> {
-                    handleAuth(response)
+                    handleResponses(response)
                 }
                 is Resource.Loading -> {
                     when (response.isLoading) {
@@ -238,7 +249,7 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
                     expandOrderSheet(response.value, response.value.transaction.status)
                 }
                 is Resource.Error -> {
-                    handleAuth(response)
+                    handleResponses(response)
                 }
                 is Resource.Loading -> {
                     when (response.isLoading) {
@@ -256,7 +267,7 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
                         addPolyline(response.value, ORDER_ACCEPTED)
                 }
                 is Resource.Error -> {
-                    handleAuth(response)
+                    handleResponses(response)
                 }
                 is Resource.Loading -> {
                     when (response.isLoading) {
@@ -274,7 +285,7 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
                         addPolyline(response.value, ORDER_VERIFIED)
                 }
                 is Resource.Error -> {
-                    handleAuth(response)
+                    handleResponses(response)
                 }
                 is Resource.Loading -> {
                     when (response.isLoading) {
@@ -520,8 +531,10 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
             LocationRequest.PRIORITY_HIGH_ACCURACY,
             cancellationToken.token
         ).addOnSuccessListener {
-            currentRef.child("coordinate").setValue(StringBuilder().append(it?.latitude.toString()).append(", ")
-                .append(it?.longitude.toString()).toString())
+            currentRef.child("coordinate").setValue(
+                StringBuilder().append(it?.latitude.toString()).append(", ")
+                    .append(it?.longitude.toString()).toString()
+            )
         }
 
     }
@@ -581,16 +594,34 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
         polylineToStore(data)
     }
 
+    @SuppressLint("MissingPermission")
     private fun polylineToStore(data: TransactionResponse) {
-        homeViewModel.directionStore(
-            DirectionData(
-                myLocation!!,
-                LatLng(data.store.latitude.toDouble(), data.store.longititude.toDouble())
-            )
-        )
+        val token = CancellationTokenSource()
+
+        val task = fusedLocationProviderClient.getCurrentLocation(
+            LocationRequest.PRIORITY_HIGH_ACCURACY,
+            token.token
+        ) as Task<Location>
+
+        task.addOnSuccessListener { location ->
+            if (location != null) {
+                val lastLocation = LatLng(location.latitude, location.longitude)
+                myLocation = lastLocation
+                homeViewModel.directionStore(
+                    DirectionData(
+                        myLocation!!,
+                        LatLng(data.store.latitude.toDouble(), data.store.longititude.toDouble())
+                    )
+                )
+            }
+        }.addOnFailureListener {
+            showToast("Error getting location", FancyToast.ERROR)
+        }
+
     }
 
 
+    @SuppressLint("MissingPermission")
     private fun expandOrderSheet(data: TransactionResponse, states: Int) {
         updateStatus(DRIVER_NOT_AVAILABLE)
         binding.btnStatus.isEnabled = false
@@ -627,7 +658,7 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
                             updateStatus(DRIVER_AVAILABLE)
                         }
                         is Resource.Error -> {
-                            handleAuth(response)
+                            handleResponses(response)
                         }
                         is Resource.Loading -> {
                             when (response.isLoading) {
@@ -661,7 +692,7 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
                         showToast("Success verification code!", FancyToast.SUCCESS)
                     }
                     is Resource.Error -> {
-                        handleAuth(response)
+                        handleResponses(response)
                     }
                     is Resource.Loading -> {
                         when (response.isLoading) {
@@ -673,23 +704,42 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
             })
         }
         CoroutineScope(Main).launch {
-            delay(2000)
-            if (states == ORDER_ACCEPTED) {
-                homeViewModel.directionStore(
-                    DirectionData(
-                        myLocation!!,
-                        LatLng(data.store.latitude.toDouble(), data.store.longititude.toDouble())
+            val token = CancellationTokenSource()
+
+            val task = fusedLocationProviderClient.getCurrentLocation(
+                LocationRequest.PRIORITY_HIGH_ACCURACY,
+                token.token
+            ) as Task<Location>
+
+            task.addOnSuccessListener { location ->
+                if (location != null) {
+                    val lastLocation = LatLng(location.latitude, location.longitude)
+                    myLocation = lastLocation
+
+                    if (states == ORDER_ACCEPTED) {
+                        homeViewModel.directionStore(
+                            DirectionData(
+                                myLocation!!,
+                                LatLng(
+                                    data.store.latitude.toDouble(),
+                                    data.store.longititude.toDouble()
+                                )
+                            )
+                        )
+                    } else homeViewModel.directionUser(
+                        DirectionData(
+                            myLocation!!,
+                            LatLng(
+                                data.transaction.latitude.toDouble(),
+                                data.transaction.longitude.toDouble()
+                            )
+                        )
                     )
-                )
-            } else homeViewModel.directionUser(
-                DirectionData(
-                    myLocation!!,
-                    LatLng(
-                        data.transaction.latitude.toDouble(),
-                        data.transaction.longitude.toDouble()
-                    )
-                )
-            )
+                }
+            }.addOnFailureListener {
+                showToast("Error getting location", FancyToast.ERROR)
+            }
+
         }
 
     }
