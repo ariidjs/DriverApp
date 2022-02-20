@@ -10,6 +10,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,8 +19,10 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import app.proyekakhir.core.data.Resource
+import app.proyekakhir.core.data.source.remote.network.ApiMapsInterface
 import app.proyekakhir.core.data.source.remote.response.account.AccountData
 import app.proyekakhir.core.data.source.remote.response.direction.DirectionResponse
 import app.proyekakhir.core.data.source.remote.response.transaction.TransactionResponse
@@ -28,7 +31,9 @@ import app.proyekakhir.core.domain.model.driver.FirebaseData
 import app.proyekakhir.core.domain.model.transaction.MessageData
 import app.proyekakhir.core.ui.BaseFragment
 import app.proyekakhir.core.util.*
+import app.proyekakhir.core.util.Constants.DIRECTION_MODE
 import app.proyekakhir.core.util.Constants.DRIVER_AVAILABLE
+import app.proyekakhir.core.util.Constants.DRIVER_DATA_REFERENCE
 import app.proyekakhir.core.util.Constants.DRIVER_NOT_AVAILABLE
 import app.proyekakhir.core.util.Constants.DRIVER_ONLINE_REFERENCE
 import app.proyekakhir.core.util.Constants.DRIVER_REFERENCE
@@ -37,6 +42,8 @@ import app.proyekakhir.core.util.Constants.MAPS_ZOOM_LEVEL
 import app.proyekakhir.core.util.Constants.ORDER_ACCEPTED
 import app.proyekakhir.core.util.Constants.ORDER_FINISHED
 import app.proyekakhir.core.util.Constants.ORDER_VERIFIED
+import app.proyekakhir.core.util.Constants.ROUTING_PREF
+import app.proyekakhir.driverapp.AlarmReceiver
 import app.proyekakhir.driverapp.BuildConfig
 import app.proyekakhir.driverapp.R
 import app.proyekakhir.driverapp.databinding.DialogPinLayoutBinding
@@ -62,13 +69,19 @@ import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
 import com.shashank.sony.fancytoastlib.FancyToast
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.qualifier.named
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -92,12 +105,23 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
     private var latLngBounds: LatLngBounds? = null
     private var storeMarker: Marker? = null
     private var buyerMarker: Marker? = null
+    private val apiMapsInterface: ApiMapsInterface by inject(named("maps"))
+    private lateinit var handler: Handler
+    private lateinit var runnable: Runnable
+    private var latLng = ArrayList<LatLng>()
+    private var index = 0
+    private var previousLatLng: LatLng? = null
+    private var currentLatLng: LatLng? = null
+    private var movingDriverMarker: Marker? = null
+    private var newLocation: String = ""
+    private var oldLocation: String = ""
 
     //Firebase Database
     private val firebaseDatabase: FirebaseDatabase by inject()
     private lateinit var onlineRef: DatabaseReference
     private lateinit var currentRef: DatabaseReference
     private lateinit var driverLocationRef: DatabaseReference
+    private lateinit var driverRef: DatabaseReference
     private lateinit var geoFire: GeoFire
 
     //    private lateinit var geoQuery: GeoQuery
@@ -107,7 +131,7 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
     //Location
     private val fusedLocationProviderClient: FusedLocationProviderClient by inject()
     private var mMap: GoogleMap? = null
-
+    private var isMoving = false
 
     private var isOnline = false
 
@@ -122,30 +146,33 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
             firebaseDatabase.getReference(DRIVER_REFERENCE)
                 .child(localProperties.idDriver.toString())
         onlineRef = firebaseDatabase.getReference(DRIVER_ONLINE_REFERENCE)
+        driverRef = firebaseDatabase.getReference(DRIVER_DATA_REFERENCE)
+            .child(localProperties.idDriver.toString())
         val currentValueEvent = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     isOnline = true
                     homeViewModel.requestLocation()
                     updateUIStatus(binding, true)
-                    currentRef.child("status").addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            if (snapshot.exists()) {
-                                if (snapshot.getValue<Int>() == 3) {
-                                    binding.cardBanned.show()
-                                    binding.btnStatus.isEnabled = false
-                                }else if(snapshot.getValue<Int>() == 0) {
-                                    binding.cardBanned.hide()
-                                    binding.btnStatus.isEnabled = true
+                    driverRef.child("status")
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (snapshot.exists()) {
+                                    if (snapshot.getValue<Int>() == 3) {
+                                        binding.cardBanned.show()
+                                        binding.btnStatus.isEnabled = false
+                                    } else if (snapshot.getValue<Int>() == 0) {
+                                        binding.cardBanned.hide()
+                                        binding.btnStatus.isEnabled = true
+                                    }
                                 }
                             }
-                        }
 
-                        override fun onCancelled(error: DatabaseError) {
-                            showToast(error.message, FancyToast.ERROR)
-                        }
+                            override fun onCancelled(error: DatabaseError) {
+                                showToast(error.message, FancyToast.ERROR)
+                            }
 
-                    })
+                        })
                 } else {
                     Log.i("TAGG", "onDataChange: not exists")
                 }
@@ -184,7 +211,7 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         collapseToolbar(binding)
-
+        handler = Handler()
         mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
         mapFragment?.getMapAsync(this)
         return binding.root
@@ -211,6 +238,12 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
     }
 
     private fun observableData() {
+        fusedLocationProviderClient.lastLocation.addOnSuccessListener {
+            oldLocation =
+                StringBuilder().append(it.latitude).append(",").append(it.longitude)
+                    .toString()
+        }
+
         homeViewModel.location.observe(viewLifecycleOwner, { location ->
             if (location != null) {
 //                val lastLocation = LatLng(location.latitude, location.longitude)
@@ -218,6 +251,13 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
 //                    CameraUpdateFactory.newLatLngZoom(lastLocation, MAPS_ZOOM_LEVEL)
 //                )
                 setLocationToDB(location)
+                newLocation =
+                    StringBuilder().append(location.latitude).append(",").append(location.longitude)
+                        .toString()
+
+                if (isMoving) {
+                    moveMarkerDriver(oldLocation, newLocation)
+                }
             }
         })
 
@@ -263,8 +303,11 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
         homeViewModel.directionStore.observe(viewLifecycleOwner, { response ->
             when (response) {
                 is Resource.Success -> {
-                    if (response.value.routes.isNotEmpty())
+                    if (response.value.routes.isNotEmpty()) {
                         addPolyline(response.value, ORDER_ACCEPTED)
+                        isMoving = true
+                        mMap?.isMyLocationEnabled = false
+                    }
                 }
                 is Resource.Error -> {
                     handleResponses(response)
@@ -281,8 +324,11 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
         homeViewModel.directionUser.observe(viewLifecycleOwner, { response ->
             when (response) {
                 is Resource.Success -> {
-                    if (response.value.routes.isNotEmpty())
+                    if (response.value.routes.isNotEmpty()) {
                         addPolyline(response.value, ORDER_VERIFIED)
+                        isMoving = true
+                        mMap?.isMyLocationEnabled = false
+                    }
                 }
                 is Resource.Error -> {
                     handleResponses(response)
@@ -362,6 +408,17 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
         binding.txtRating.text = data.rating.toString()
         binding.txtTotalOrder.text = data.total_order.toString()
         binding.btnStatus.setOnClickListener { registerOnline() }
+
+        driverRef.setValue(
+            FirebaseData(
+                StringBuilder().append(myLocation?.latitude.toString()).append(", ")
+                    .append(myLocation?.longitude.toString()).toString(),
+                data.id,
+                data.rating,
+                0, 2
+            )
+        )
+
         val token = CancellationTokenSource()
         if (accountData?.status == DRIVER_NOT_AVAILABLE) {
             binding.fabMyLoc.setOnClickListener {
@@ -399,7 +456,6 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
     }
 
     private fun registerOnline() {
-
         with(binding) {
             isOnline = if (!isOnline) {
                 if (ActivityCompat.checkSelfPermission(
@@ -412,22 +468,13 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
                 ) {
                     return
                 }
-                accountData?.let { data ->
-                    currentRef.setValue(
-                        FirebaseData(
-                            StringBuilder().append(myLocation?.latitude.toString()).append(", ")
-                                .append(myLocation?.longitude.toString()).toString(),
-                            data.id,
-                            data.rating,
-                            data.total_order,
-                            data.status
-                        )
-                    )
-                }
+                AlarmReceiver().setReset(requireContext())
                 homeViewModel.requestLocation()
+                updateStatus(0)
                 true
             } else {
                 updateUIStatus(this, false)
+                AlarmReceiver().cancelReset(requireContext())
                 homeViewModel.removeLocation()
                 removeLocationFromDB()
                 false
@@ -438,6 +485,7 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
 
     private fun removeLocationFromDB() {
         currentRef.removeValue()
+        updateStatus(2)
         onlineValueEventListener?.let { onlineRef.removeEventListener(it) }
 
     }
@@ -514,7 +562,7 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
     }
 
     private fun updateStatus(status: Int) {
-        currentRef.child("status").setValue(status)
+        driverRef.child("status").setValue(status)
         val cancellationToken = CancellationTokenSource()
 
         if (ActivityCompat.checkSelfPermission(
@@ -531,7 +579,7 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
             LocationRequest.PRIORITY_HIGH_ACCURACY,
             cancellationToken.token
         ).addOnSuccessListener {
-            currentRef.child("coordinate").setValue(
+            driverRef.child("coordinate").setValue(
                 StringBuilder().append(it?.latitude.toString()).append(", ")
                     .append(it?.longitude.toString()).toString()
             )
@@ -652,6 +700,8 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
                             bluePolyLine?.remove()
                             whitePolyLine?.remove()
                             buyerMarker?.remove()
+                            mMap?.isMyLocationEnabled = true
+                            isMoving = false
                             binding.btnStatus.isEnabled = true
                             mMap?.clear()
                             homeViewModel.getAccount()
@@ -678,7 +728,9 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
                         whitePolyLine?.remove()
                         storeMarker?.remove()
                         mMap?.clear()
+                        latLng.clear()
                         dialog.dismiss()
+                        movingDriverMarker = addDriverMarkerAndGet(myLocation!!)
                         homeViewModel.directionUser(
                             DirectionData(
                                 myLocation!!,
@@ -717,6 +769,7 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
                     myLocation = lastLocation
 
                     if (states == ORDER_ACCEPTED) {
+                        movingDriverMarker = addDriverMarkerAndGet(myLocation!!)
                         homeViewModel.directionStore(
                             DirectionData(
                                 myLocation!!,
@@ -726,15 +779,18 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
                                 )
                             )
                         )
-                    } else homeViewModel.directionUser(
-                        DirectionData(
-                            myLocation!!,
-                            LatLng(
-                                data.transaction.latitude.toDouble(),
-                                data.transaction.longitude.toDouble()
+                    } else {
+                        movingDriverMarker = addDriverMarkerAndGet(myLocation!!)
+                        homeViewModel.directionUser(
+                            DirectionData(
+                                myLocation!!,
+                                LatLng(
+                                    data.transaction.latitude.toDouble(),
+                                    data.transaction.longitude.toDouble()
+                                )
                             )
                         )
-                    )
+                    }
                 }
             }.addOnFailureListener {
                 showToast("Error getting location", FancyToast.ERROR)
@@ -780,4 +836,110 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
             }
         }
     }
+
+    private fun moveMarkerDriver(driverOldLoc: String, driverNewLoc: String) {
+        val apiFlow = flow {
+            emit(
+                apiMapsInterface.getDirections(
+                    BuildConfig.DIRECTION_API_KEY,
+                    DIRECTION_MODE,
+                    ROUTING_PREF,
+                    driverOldLoc,
+                    driverNewLoc
+                )
+            )
+        }.flowOn(Dispatchers.IO)
+
+
+        lifecycleScope.launch(Main) {
+            apiFlow.collect { data ->
+                for (i in data.routes.indices) {
+                    val polyline = data.routes[i].overview_polyline.points
+                    listPolyline = decodePoly(polyline)
+                }
+
+                val coloredPolylineOptions = PolylineOptions()
+                coloredPolylineOptions.color(Color.WHITE)
+                coloredPolylineOptions.startCap(SquareCap())
+                coloredPolylineOptions.width(12f)
+                coloredPolylineOptions.jointType(JointType.ROUND)
+                coloredPolylineOptions.addAll(listPolyline)
+//                mMap?.addPolyline(coloredPolylineOptions)
+
+
+                latLng.add(
+                    LatLng(
+                        driverNewLoc.split(",")[0].toDouble(),
+                        driverNewLoc.split(",")[1].toDouble()
+                    )
+                )
+
+                Log.i("TAGG", "moveMarkerDriver: $latLng")
+
+                runnable = Runnable {
+                    run {
+                        if (index < latLng.size) {
+                            updateDriverLocation(latLng[index])
+                            handler.postDelayed(runnable, 3000)
+                            ++index
+                        } else {
+                            handler.removeCallbacks(runnable)
+                        }
+                    }
+
+                }
+                handler.postDelayed(runnable, 5000)
+            }
+        }
+    }
+
+    private fun updateDriverLocation(latLng: LatLng) {
+        if (movingDriverMarker == null) {
+            movingDriverMarker = addDriverMarkerAndGet(latLng)
+        }
+        if (previousLatLng == null) {
+            currentLatLng = latLng
+            previousLatLng = currentLatLng
+            movingDriverMarker?.position = currentLatLng
+            movingDriverMarker?.setAnchor(0.5f, 0.5f)
+            animateCamera(currentLatLng!!)
+        } else {
+            previousLatLng = currentLatLng
+            currentLatLng = latLng
+            val valueAnimator = driverAnimator()
+            valueAnimator.addUpdateListener { va ->
+                if (currentLatLng != null && previousLatLng != null) {
+                    val multiplier = va.animatedFraction
+                    val nextLocation = LatLng(
+                        multiplier * currentLatLng!!.latitude + (1 - multiplier) * previousLatLng!!.latitude,
+                        multiplier * currentLatLng!!.longitude + (1 - multiplier) * previousLatLng!!.longitude
+                    )
+                    movingDriverMarker?.position = nextLocation
+                    val rotation = getRotation(previousLatLng!!, nextLocation)
+                    if (!rotation.isNaN()) {
+                        movingDriverMarker?.rotation = rotation
+                    }
+                    movingDriverMarker?.setAnchor(0.5f, 0.5f)
+                    animateCamera(nextLocation)
+                }
+            }
+            valueAnimator.start()
+        }
+    }
+
+    private fun animateCamera(latLng: LatLng) {
+        val cameraPosition = CameraPosition.Builder().target(latLng).zoom(17f).build()
+        mMap?.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+    }
+
+    private fun addDriverMarkerAndGet(latLng: LatLng): Marker {
+        return mMap?.addMarker(
+            MarkerOptions().position(latLng).flat(true).icon(
+                BitmapDescriptorFactory.fromBitmap(
+                    getRiderBitmap(requireContext())
+                )
+            )
+        )!!
+    }
+
 }

@@ -2,6 +2,7 @@ package app.proyekakhir.driverapp.ui.home
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -10,6 +11,7 @@ import app.proyekakhir.driverapp.R
 import app.proyekakhir.driverapp.databinding.ActivityHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import id.ionbit.ionalert.IonAlert
+import java.util.*
 
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {

@@ -32,7 +32,7 @@ class IncomingFragment : BaseDialogFragment() {
     private var isPaused = false
 
     private val firebaseDatabase: FirebaseDatabase by inject()
-    private lateinit var currentRef: DatabaseReference
+    private lateinit var driverRef: DatabaseReference
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog: BottomSheetDialog =
@@ -42,7 +42,7 @@ class IncomingFragment : BaseDialogFragment() {
         _binding = FragmentIncomingBinding.inflate(layoutInflater, null, false)
         dialog.setContentView(binding.root)
         val localProperties = LocalProperties(requireContext())
-        currentRef = firebaseDatabase.getReference(Constants.DRIVER_REFERENCE)
+        driverRef = firebaseDatabase.getReference(Constants.DRIVER_DATA_REFERENCE)
                 .child(localProperties.idDriver.toString())
         val mBehavior = BottomSheetBehavior.from(binding.root.parent as View)
         mBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -145,7 +145,7 @@ class IncomingFragment : BaseDialogFragment() {
     }
 
     private fun setBanTemp() {
-        currentRef.child("status").setValue(3)
+        driverRef.child("status").setValue(3)
         AlarmReceiver().setBannedTime(requireContext())
     }
 

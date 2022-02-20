@@ -5,5 +5,5 @@ data class FirebaseData(
     val id_driver: Int,
     val rating: Int,
     val total_order: Int,
-    val status: Int
+    val status:Int
 )

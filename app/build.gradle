@@ -18,6 +18,7 @@ android {
         versionCode 1
         versionName "1.0"
         buildConfigField "String", "IMG_URL", "\"http://34.221.228.202:8081/images\""
+        buildConfigField "String", "DIRECTION_API_KEY", "\"AIzaSyBh9PO29GvaU0N8U_ZdUVxzqMxvGcfHWGA\""
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

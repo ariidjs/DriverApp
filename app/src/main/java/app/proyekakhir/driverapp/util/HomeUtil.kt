@@ -33,6 +33,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.abs
+import kotlin.math.atan
 
 
 fun Fragment.updateUIStatus(binding: FragmentHomeBinding, state: Boolean) {
@@ -81,6 +83,40 @@ fun getStoreMarkerBitmap(context: Context): Bitmap {
 fun getUserMarkerBitmap(context: Context): Bitmap {
     val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.ic_customer)
     return Bitmap.createScaledBitmap(bitmap, 80, 80, false)
+}
+
+fun getRiderBitmap(context: Context): Bitmap {
+    val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.ic_driver_top)
+    return Bitmap.createScaledBitmap(bitmap, 150, 100, false)
+}
+
+fun driverAnimator(): ValueAnimator {
+    val valueAnimator = ValueAnimator.ofFloat(0f, 1f)
+    valueAnimator.duration = 3000
+    valueAnimator.interpolator = LinearInterpolator()
+    return valueAnimator
+}
+
+fun getRotation(start: LatLng, end: LatLng): Float {
+    val latDifference: Double = abs(start.latitude - end.latitude)
+    val lngDifference: Double = abs(start.longitude - end.longitude)
+    var rotation = -1F
+    when {
+        start.latitude < end.latitude && start.longitude < end.longitude -> {
+            rotation = Math.toDegrees(atan(lngDifference / latDifference)).toFloat()
+        }
+        start.latitude >= end.latitude && start.longitude < end.longitude -> {
+            rotation = (90 - Math.toDegrees(atan(lngDifference / latDifference)) + 90).toFloat()
+        }
+        start.latitude >= end.latitude && start.longitude >= end.longitude -> {
+            rotation = (Math.toDegrees(atan(lngDifference / latDifference)) + 180).toFloat()
+        }
+        start.latitude < end.latitude && start.longitude >= end.longitude -> {
+            rotation =
+                (90 - Math.toDegrees(atan(lngDifference / latDifference)) + 270).toFloat()
+        }
+    }
+    return rotation
 }
 
 fun decodePoly(encoded: String): ArrayList<LatLng> {

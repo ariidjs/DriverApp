@@ -25,14 +25,14 @@ class IncomingActivity : BaseActivity() {
     private lateinit var countDownTimer: CountDownTimer
     private val viewModel: TransactionViewModel by inject()
     private val firebaseDatabase: FirebaseDatabase by inject()
-    private lateinit var currentRef: DatabaseReference
+    private lateinit var driverRef: DatabaseReference
     private var isPaused = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityIncomingBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        currentRef =
-            firebaseDatabase.getReference(Constants.DRIVER_REFERENCE)
+        driverRef =
+            firebaseDatabase.getReference(Constants.DRIVER_DATA_REFERENCE)
                 .child(localProperties.idDriver.toString())
         intent.getParcelableExtra<MessageData>("orders").let { data ->
             if (data != null) {
@@ -94,7 +94,7 @@ class IncomingActivity : BaseActivity() {
     }
 
     private fun setBanTemp() {
-        currentRef.child("status").setValue(3)
+        driverRef.child("status").setValue(3)
         AlarmReceiver().setBannedTime(this)
     }
 

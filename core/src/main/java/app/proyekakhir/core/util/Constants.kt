@@ -29,6 +29,7 @@ object Constants {
 
     const val DRIVER_REFERENCE = "DriversLocation"
     const val DRIVER_ONLINE_REFERENCE = ".info/connected"
+    const val DRIVER_DATA_REFERENCE = "DriversData"
     const val LOCATION_CHILD = "tracksdata"
     const val ANIMATION_FAST_MILLIS = 50L
     const val ANIMATION_SLOW_MILLIS = 100L
