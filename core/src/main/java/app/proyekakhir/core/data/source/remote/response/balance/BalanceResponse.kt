@@ -4,7 +4,7 @@ data class BalanceResponse(
     val data: List<BalanceData>,
     val message: String,
     val success: Boolean,
-    val total_saldo: Int
+    val total_saldo: Double
 )
 data class BalanceData(
     val created_at: String,
@@ -13,7 +13,7 @@ data class BalanceData(
     val image: String,
     val namabank: String,
     val norek: String,
-    val saldo: Int,
+    val saldo: Double,
     val status: String,
     val type: String,
     val updated_at: String

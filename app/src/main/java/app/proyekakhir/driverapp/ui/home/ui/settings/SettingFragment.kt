@@ -66,7 +66,7 @@ class SettingFragment : BaseFragment() {
         binding.tvAccountName.text = data.name_driver
         binding.tvAccountPhone.text = data.phone
         binding.tvVehicleNumber.text = data.plat_kendaraan
-        binding.tvBalance.text = convertToIDR(data.saldo)
+        binding.tvBalance.text = convertToIDR(data.saldo.toInt())
         binding.tvPendapatan.text = convertToIDR(data.benefit)
         binding.btnLogout.setOnClickListener {
             showLogoutDialog(localProperties, firebaseDatabase)

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import app.proyekakhir.core.ui.BaseDialogFragment
+import app.proyekakhir.core.util.Constants.ERROR_INSUFFICIENT_BALANCE
 import app.proyekakhir.core.util.Constants.ERROR_NOT_REGISTER
 import app.proyekakhir.core.util.Constants.ERROR_UNAUTHORIZED
 import app.proyekakhir.driverapp.R
@@ -53,6 +54,17 @@ class DialogFragment : BaseDialogFragment() {
                     binding.btnOk.text = getString(R.string.daftar_sini)
                     binding.btnOk.setOnClickListener {
                         findNavController().navigate(R.id.action_dialogFragment3_to_signUpFragment)
+                        dismiss()
+                    }
+                }
+                ERROR_INSUFFICIENT_BALANCE -> {
+                    binding.fabClose.hide()
+                    binding.tvTitle.text = getString(R.string.insufficient_title)
+                    binding.tvDesc.text = getString(R.string.desc_insufficient)
+                    binding.imgIlustration.setImageResource(R.drawable.img_insufficient)
+                    binding.btnOk.text = getString(R.string.btn_saldo_direct)
+                    binding.btnOk.setOnClickListener {
+                        findNavController().navigate(R.id.action_dialogFragment_to_balanceFragment)
                         dismiss()
                     }
                 }

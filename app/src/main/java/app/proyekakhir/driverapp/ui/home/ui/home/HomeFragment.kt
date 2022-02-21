@@ -37,6 +37,7 @@ import app.proyekakhir.core.util.Constants.DRIVER_DATA_REFERENCE
 import app.proyekakhir.core.util.Constants.DRIVER_NOT_AVAILABLE
 import app.proyekakhir.core.util.Constants.DRIVER_ONLINE_REFERENCE
 import app.proyekakhir.core.util.Constants.DRIVER_REFERENCE
+import app.proyekakhir.core.util.Constants.ERROR_INSUFFICIENT_BALANCE
 import app.proyekakhir.core.util.Constants.LOCATION_CHILD
 import app.proyekakhir.core.util.Constants.MAPS_ZOOM_LEVEL
 import app.proyekakhir.core.util.Constants.ORDER_ACCEPTED
@@ -407,17 +408,31 @@ class HomeFragment : BaseFragment(), OnMapReadyCallback {
             .into(binding.profileImage)
         binding.txtRating.text = data.rating.toString()
         binding.txtTotalOrder.text = data.total_order.toString()
-        binding.btnStatus.setOnClickListener { registerOnline() }
+        binding.btnStatus.setOnClickListener {
+            if (data.saldo.toInt() <5000) {
+                val action = HomeFragmentDirections.actionNavHomeToDialogFragment(
+                    ERROR_INSUFFICIENT_BALANCE)
+                findNavController().navigate(action)
+            }else {
+                registerOnline()
+            }
 
-        driverRef.setValue(
-            FirebaseData(
-                StringBuilder().append(myLocation?.latitude.toString()).append(", ")
-                    .append(myLocation?.longitude.toString()).toString(),
-                data.id,
-                data.rating,
-                0, 2
+        }
+
+        if (!isOnline) {
+            driverRef.setValue(
+                FirebaseData(
+                    StringBuilder().append(myLocation?.latitude.toString()).append(", ")
+                        .append(myLocation?.longitude.toString()).toString(),
+                    data.id,
+                    data.rating,
+                    0
+                )
             )
-        )
+            driverRef.child("status").setValue(2)
+        }else {
+            driverRef.child("status").setValue(0)
+        }
 
         val token = CancellationTokenSource()
         if (accountData?.status == DRIVER_NOT_AVAILABLE) {

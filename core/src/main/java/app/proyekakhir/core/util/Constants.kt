@@ -54,5 +54,6 @@ object Constants {
     //ERROR HANDLE
     const val ERROR_UNAUTHORIZED = 100
     const val ERROR_NOT_REGISTER = 101
+    const val ERROR_INSUFFICIENT_BALANCE = 102
 
 }

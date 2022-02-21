@@ -112,5 +112,8 @@
         <argument
             android:name="type"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_dialogFragment_to_balanceFragment"
+            app:destination="@id/balanceFragment" />
     </dialog>
 </navigation>

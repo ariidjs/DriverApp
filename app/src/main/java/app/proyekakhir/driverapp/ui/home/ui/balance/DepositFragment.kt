@@ -106,6 +106,7 @@ class DepositFragment : BaseDialogFragment(), AdapterView.OnItemClickListener {
             when (response) {
                 is Resource.Success -> {
                     showToast("Success", FancyToast.SUCCESS)
+                    dismiss()
                 }
                 is Resource.Error -> {
                     handleResponses(response)

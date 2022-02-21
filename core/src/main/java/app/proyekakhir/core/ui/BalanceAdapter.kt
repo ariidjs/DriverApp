@@ -38,7 +38,7 @@ class BalanceAdapter :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(balanceData: BalanceData) = with(binding) {
             tvType.text = balanceData.type
-            tvBalance.text = convertToIDR(balanceData.saldo)
+            tvBalance.text = convertToIDR(balanceData.saldo.toInt())
             tvStatus.text = balanceData.status
             tvDate.text = convertDate(balanceData.created_at)
         }

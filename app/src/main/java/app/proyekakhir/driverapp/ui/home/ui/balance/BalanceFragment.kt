@@ -65,7 +65,7 @@ class BalanceFragment : BaseFragment() {
     private fun setData(response: BalanceResponse) {
         with(binding) {
             rvBalance.adapter = BalanceAdapter().also { it.items = response.data }
-            tvBalance.text = convertToIDR(response.total_saldo)
+            tvBalance.text = convertToIDR(response.total_saldo.toInt())
             btnTopUp.setOnClickListener {
                 val action = BalanceFragmentDirections.actionBalanceFragmentToDepositFragment(TYPE_DEPOSIT)
                 findNavController().navigate(action)

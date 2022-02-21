@@ -53,6 +53,9 @@
     <string name="btn_unauth">Masuk</string>
     <string name="title_not_registered">Anda belum terdaftar</string>
     <string name="desc_not_registered">Gabung yuk, dengan mitra driver kami</string>
+    <string name="insufficient_title">Sorry ya, Saldo anda tidak mencukupi</string>
+    <string name="desc_insufficient">Silahkan topup saldo dulu ya!</string>
+    <string name="btn_saldo_direct">Ke halaman saldo</string>
 
     <string-array name="jk">
         <item>Perempuan</item>
